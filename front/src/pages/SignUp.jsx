@@ -8,7 +8,7 @@ export default function SignUp() {
     email: '',
     password: '',
     passwordConfirm: '',
-    studentRegNumber: '' // Add this line
+    studentRegNumber: '' 
   });
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
