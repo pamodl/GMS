@@ -50,7 +50,7 @@ export default function Login() {
       }
       setLoading(false);
       setError(null);
-      navigate('/dashboard'); // Redirect to dashboard or another page after successful login
+      navigate('/'); // Redirect to dashboard or another page after successful login
     } catch (err) {
       setLoading(false);
       setError(err.message);
