@@ -1,16 +1,18 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginStart, loginSuccess, loginFailure } from '../redux/user/userSlice';
 
 export default function Login() {
   const [formData, setFormData] = React.useState({
     email: '',
     password: ''
   });
-  const [error, setError] = React.useState(null);
-  const [loading, setLoading] = React.useState(false);
+  const { loading, error} = useSelector((state) => state.user)
   const [passwordVisible, setPasswordVisible] = React.useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -27,7 +29,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
+      dispatch(loginStart());
       const res = await fetch('/Back/auth/login', {
         method: 'POST',
         headers: {
@@ -44,18 +46,17 @@ export default function Login() {
       const data = await res.json();
       console.log(data);
       if (data.success === false) {
-        setLoading(false);
-        setError(data.message);
+        dispatch(loginFailure(data.message));
         return;
       }
-      setLoading(false);
-      setError(null);
-      navigate('/'); // Redirect to dashboard or another page after successful login
+
+      dispatch(loginSuccess(data));
+      navigate('/');
+
     } catch (err) {
-      setLoading(false);
-      setError(err.message);
+      dispatch(loginFailure(err.message));
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center">
