@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
+import checkinoutRouter from './routes/checkinout.route.js';
 dotenv.config();
 
 mongoose
@@ -25,3 +26,4 @@ app.listen(3000, () => {
 
 app.use("/Back/user", userRouter);
 app.use("/Back/auth", authRouter);
+app.use("/Back/checkinout", checkinoutRouter);
