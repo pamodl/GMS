@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
 import checkinoutRouter from './routes/checkinout.route.js';
+import equipmentRouter from './routes/equipment.route.js'; // Import the equipment routes
+
 dotenv.config();
 
 mongoose
@@ -27,3 +29,4 @@ app.listen(3000, () => {
 app.use("/Back/user", userRouter);
 app.use("/Back/auth", authRouter);
 app.use("/Back/checkinout", checkinoutRouter);
+app.use('/Back/equipment', equipmentRouter); // Add the equipment routes
