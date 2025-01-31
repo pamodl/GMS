@@ -18,9 +18,9 @@ export default function Home() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Check In/Out</h2>
             <p className="text-gray-600 mb-4">Quick digital check-in and check-out for gym access</p>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <Link to="/check-in-out" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
               Check In/Out
-            </button>
+            </Link>
           </div>
           
           {/* Equipment Management */}
