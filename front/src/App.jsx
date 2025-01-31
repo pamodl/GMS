@@ -3,6 +3,7 @@ import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
+import CheckInOut from './pages/CheckIn'
 import ManageEquipment from './pages/ManageEquipment'
 import Header from './components/Header'
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/manage-equipment" element={<ManageEquipment />} />
+        <Route path="/check-in-out" element={<CheckInOut />} />
       </Routes>
     
   </BrowserRouter>
