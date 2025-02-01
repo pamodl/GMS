@@ -43,6 +43,13 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const regNumberPattern = /^[A-Za-z]{2}\/\d{4}\/\d{5}$/;
+
+    if (!regNumberPattern.test(formData.studentRegNumber)) {
+      setError('Student Registration Number must be in the format SC/2222/11111');
+      return;
+    }
+
     if (formData.password !== formData.passwordConfirm) {
       setError('Passwords do not match');
       return;

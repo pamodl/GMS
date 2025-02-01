@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import CheckInOut from './pages/CheckIn'
 import ManageEquipment from './pages/ManageEquipment'
+import ViewEquipment from './pages/ViewEquipment'
 import Header from './components/Header'
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/manage-equipment" element={<ManageEquipment />} />
         <Route path="/check-in-out" element={<CheckInOut />} />
+        <Route path="/view-equipment" element={<ViewEquipment />} />
       </Routes>
     
   </BrowserRouter>

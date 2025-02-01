@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export default function ManageEquipment() {
+export default function ViewEquipment() {
   const [equipment, setEquipment] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -45,7 +45,7 @@ export default function ManageEquipment() {
 
   return (
     <div>
-      <h1>Manage Equipment</h1>
+      <h1>View Equipment</h1>
       <input
         type="text"
         placeholder="Search equipment"
