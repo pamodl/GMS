@@ -61,7 +61,7 @@ export default function ManageEquipment() {
       </select>
       <ul>
         {filteredEquipment.map((item) => (
-          <li key={item.id}>
+          <li key={item.id || item._id || item.name}>
             {item.name} - {item.available}/{item.quantity} available ({item.category})
           </li>
         ))}
