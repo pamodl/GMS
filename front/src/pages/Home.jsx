@@ -39,7 +39,9 @@ export default function Home() {
             <h2 className="text-xl font-semibold mb-4">Check Availability</h2>
             <p className="text-gray-600 mb-4">View gym and equipment availability</p>
             <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-              View Status
+            <Link to="/view-equipment" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+               View Status
+            </Link>
             </button>
           </div>
         </div>
