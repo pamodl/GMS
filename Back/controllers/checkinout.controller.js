@@ -25,3 +25,12 @@ export const checkOut = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getActiveUsersCount = async (req, res) => {
+  try {
+    const activeUsersCount = await CheckIn.countDocuments({ checkOutTime: { $exists: false } });
+    res.json({ count: activeUsersCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

@@ -1,12 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkIn, checkOut } from '../redux/checkin/checkinActions';
 import { Card, CardContent, Typography, Button, Box, Alert } from '@mui/material';
+import axios from 'axios';
 
 export default function CheckInOut() {
   const { currentUser } = useSelector((state) => state.user);
   const { isCheckedIn, lastCheckIn, lastCheckOut, loading, error } = useSelector((state) => state.checkin);
   const dispatch = useDispatch();
+  const [activeUsersCount, setActiveUsersCount] = useState(0);
+
+  useEffect(() => {
+    const fetchActiveUsersCount = async () => {
+      try {
+        const response = await axios.get('/Back/checkinout/active-users-count');
+        setActiveUsersCount(response.data.count);
+      } catch (err) {
+        console.error('Failed to fetch active users count:', err);
+      }
+    };
+
+    fetchActiveUsersCount();
+  }, [isCheckedIn, lastCheckOut]);
 
   const handleCheckIn = () => {
     if (currentUser && currentUser._id) {
@@ -46,6 +61,9 @@ export default function CheckInOut() {
           </Typography>
           <Typography variant="body1" component="div" gutterBottom>
             Last Check Out: {formatDate(lastCheckOut)}
+          </Typography>
+          <Typography variant="body1" component="div" gutterBottom>
+            Active Users: {activeUsersCount}
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
             <Button variant="contained" color="primary" onClick={handleCheckIn} disabled={loading || isCheckedIn}>
