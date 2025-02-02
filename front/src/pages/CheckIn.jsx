@@ -50,9 +50,6 @@ export default function CheckInOut() {
       setIsCheckedIn(true);
       setLastCheckIn(response.data.timestamp);
       setError(null);
-      // Fetch the updated active users count and check-in status
-      fetchActiveUsersCount();
-      fetchCheckInStatus();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to check in');
     } finally {
@@ -71,9 +68,6 @@ export default function CheckInOut() {
       setIsCheckedIn(false);
       setLastCheckOut(response.data.timestamp);
       setError(null);
-      // Fetch the updated active users count and check-in status
-      fetchActiveUsersCount();
-      fetchCheckInStatus();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to check out');
     } finally {
