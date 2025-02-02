@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Card, CardContent, Typography, Button, Box, Alert } from '@mui/material';
 import axios from 'axios';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function CheckInOut() {
   const { currentUser } = useSelector((state) => state.user);
@@ -11,6 +12,7 @@ export default function CheckInOut() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeUsersCount, setActiveUsersCount] = useState(0);
+  const [checkInData, setCheckInData] = useState([]);
 
   useEffect(() => {
     const fetchActiveUsersCount = async () => {
@@ -35,8 +37,18 @@ export default function CheckInOut() {
       }
     };
 
+    const fetchCheckInData = async () => {
+      try {
+        const response = await axios.get('/Back/checkinout/last-seven-days');
+        setCheckInData(response.data);
+      } catch (err) {
+        console.error('Failed to fetch check-in data:', err);
+      }
+    };
+
     fetchActiveUsersCount();
     fetchCheckInStatus();
+    fetchCheckInData();
   }, [currentUser]);
 
   const handleCheckIn = async () => {
@@ -50,6 +62,7 @@ export default function CheckInOut() {
       setIsCheckedIn(true);
       setLastCheckIn(response.data.timestamp);
       setError(null);
+      window.location.reload(); // Refresh the page after check-in
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to check in');
     } finally {
@@ -68,6 +81,7 @@ export default function CheckInOut() {
       setIsCheckedIn(false);
       setLastCheckOut(response.data.timestamp);
       setError(null);
+      window.location.reload(); // Refresh the page after check-out
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to check out');
     } finally {
@@ -83,7 +97,7 @@ export default function CheckInOut() {
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
-      <Card sx={{ maxWidth: 400, width: '100%', padding: 2 }}>
+      <Card sx={{ maxWidth: 800, width: '100%', padding: 2 }}>
         <CardContent>
           <Typography variant="h5" component="div" gutterBottom>
             Check In/Out
@@ -110,6 +124,21 @@ export default function CheckInOut() {
             </Button>
           </Box>
           {loading && <Typography variant="body2" color="textSecondary" sx={{ marginTop: 2 }}>Processing...</Typography>}
+          <Box sx={{ marginTop: 4 }}>
+            <Typography variant="h6" component="div" gutterBottom>
+              Busy Hours (Last 7 Days)
+            </Typography>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={checkInData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="_id" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="count" stroke="#8884d8" activeDot={{ r: 8 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </Box>
         </CardContent>
       </Card>
     </Box>

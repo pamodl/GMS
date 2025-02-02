@@ -55,3 +55,33 @@ export const getActiveUsersCount = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getLastSevenDaysCheckInData = async (req, res) => {
+  try {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const checkInData = await CheckIn.aggregate([
+      {
+        $match: {
+          checkInTime: { $gte: sevenDaysAgo }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%m-%d", date: "$checkInTime" }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    res.json(checkInData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
