@@ -1,31 +1,52 @@
-import CheckIn from "../models/checkinout.model.js";
+import CheckIn from '../models/checkinout.model.js';
 
+// Check-in controller
 export const checkIn = async (req, res) => {
   const { userId } = req.body;
   try {
-    const checkInRecord = new CheckIn({ userId, checkInTime: new Date() });
-    await checkInRecord.save();
-    res.status(201).json({ message: "Check-in successful" });
+    const existingCheckIn = await CheckIn.findOne({ userId, checkOutTime: { $exists: false } });
+    if (existingCheckIn) {
+      return res.status(400).json({ message: 'User is already checked in' });
+    }
+    const newCheckIn = new CheckIn({ userId, checkInTime: new Date() });
+    await newCheckIn.save();
+    res.status(201).json({ success: true, timestamp: newCheckIn.checkInTime });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+// Check-out controller
 export const checkOut = async (req, res) => {
   const { userId } = req.body;
   try {
-    const checkInRecord = await CheckIn.findOne({ userId, checkOutTime: null });
-    if (!checkInRecord) {
-      return res.status(404).json({ message: "No active check-in found" });
+    const existingCheckIn = await CheckIn.findOne({ userId, checkOutTime: { $exists: false } });
+    if (!existingCheckIn) {
+      return res.status(400).json({ message: 'User is not checked in' });
     }
-    checkInRecord.checkOutTime = new Date();
-    await checkInRecord.save();
-    res.status(200).json({ message: "Check-out successful" });
+    existingCheckIn.checkOutTime = new Date();
+    await existingCheckIn.save();
+    res.status(200).json({ success: true, timestamp: existingCheckIn.checkOutTime });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+export const getCheckInStatus = async (req, res) => {
+    const { userId } = req.params;
+    try {
+      const checkInRecord = await CheckIn.findOne({ userId, checkOutTime: { $exists: false } });
+      if (checkInRecord) {
+        res.json({ isCheckedIn: true, lastCheckIn: checkInRecord.checkInTime });
+      } else {
+        res.json({ isCheckedIn: false });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+// Get active users count
 export const getActiveUsersCount = async (req, res) => {
   try {
     const activeUsersCount = await CheckIn.countDocuments({ checkOutTime: { $exists: false } });
