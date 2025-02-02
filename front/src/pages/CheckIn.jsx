@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { checkIn, checkOut } from '../redux/checkin/checkinActions';
+import { useSelector } from 'react-redux';
 import { Card, CardContent, Typography, Button, Box, Alert } from '@mui/material';
 import axios from 'axios';
 
 export default function CheckInOut() {
   const { currentUser } = useSelector((state) => state.user);
-  const { isCheckedIn, lastCheckIn, lastCheckOut, loading, error } = useSelector((state) => state.checkin);
-  const dispatch = useDispatch();
+  const [isCheckedIn, setIsCheckedIn] = useState(false);
+  const [lastCheckIn, setLastCheckIn] = useState(null);
+  const [lastCheckOut, setLastCheckOut] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [activeUsersCount, setActiveUsersCount] = useState(0);
 
   useEffect(() => {
@@ -20,22 +22,62 @@ export default function CheckInOut() {
       }
     };
 
-    fetchActiveUsersCount();
-  }, [isCheckedIn, lastCheckOut]);
+    const fetchCheckInStatus = async () => {
+      if (currentUser && currentUser._id) {
+        try {
+          const response = await axios.get(`/Back/checkinout/status/${currentUser._id}`);
+          setIsCheckedIn(response.data.isCheckedIn);
+          setLastCheckIn(response.data.lastCheckIn || null);
+          setLastCheckOut(response.data.lastCheckOut || null);
+        } catch (err) {
+          console.error('Failed to fetch check-in status:', err);
+        }
+      }
+    };
 
-  const handleCheckIn = () => {
-    if (currentUser && currentUser._id) {
-      dispatch(checkIn(currentUser._id));
-    } else {
+    fetchActiveUsersCount();
+    fetchCheckInStatus();
+  }, [currentUser]);
+
+  const handleCheckIn = async () => {
+    if (!currentUser || !currentUser._id) {
       console.error('currentUser ID is not available');
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await axios.post('/Back/checkinout/checkin', { userId: currentUser._id });
+      setIsCheckedIn(true);
+      setLastCheckIn(response.data.timestamp);
+      setError(null);
+      // Fetch the updated active users count and check-in status
+      fetchActiveUsersCount();
+      fetchCheckInStatus();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to check in');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleCheckOut = () => {
-    if (currentUser && currentUser._id) {
-      dispatch(checkOut(currentUser._id));
-    } else {
+  const handleCheckOut = async () => {
+    if (!currentUser || !currentUser._id) {
       console.error('currentUser ID is not available');
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await axios.post('/Back/checkinout/checkout', { userId: currentUser._id });
+      setIsCheckedIn(false);
+      setLastCheckOut(response.data.timestamp);
+      setError(null);
+      // Fetch the updated active users count and check-in status
+      fetchActiveUsersCount();
+      fetchCheckInStatus();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to check out');
+    } finally {
+      setLoading(false);
     }
   };
 
