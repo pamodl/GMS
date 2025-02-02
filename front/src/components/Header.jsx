@@ -23,7 +23,7 @@ export default function Header() {
   return (
     <AppBar position="static">
       <Toolbar>
-      <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
+        <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
           GymTrac
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
@@ -32,7 +32,12 @@ export default function Header() {
           </Button>
           {currentUser ? (
             <>
-              <Typography variant="body1" component="div">
+              <Typography
+                variant="body1"
+                component={Link}
+                to="/profile"
+                sx={{ textDecoration: 'none', color: 'inherit' }}
+              >
                 {currentUser.username}
               </Typography>
               <Button color="inherit" onClick={handleLogout}>

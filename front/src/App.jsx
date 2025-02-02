@@ -7,6 +7,7 @@ import CheckInOut from './pages/CheckIn'
 import ManageEquipment from './pages/ManageEquipment'
 import ViewEquipment from './pages/ViewEquipment'
 import Header from './components/Header'
+import Profile from './pages/profile'
 export default function App() {
   return (
     <BrowserRouter>
@@ -19,6 +20,8 @@ export default function App() {
         <Route path="/manage-equipment" element={<ManageEquipment />} />
         <Route path="/check-in-out" element={<CheckInOut />} />
         <Route path="/view-equipment" element={<ViewEquipment />} />
+        <Route path="profile" element={<Profile />} />
+
       </Routes>
     
   </BrowserRouter>
