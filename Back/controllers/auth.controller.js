@@ -3,19 +3,25 @@ import Equipment from "../models/equipment.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 export const signup = async (req, res) => {
-  const { username, email, password, studentRegNumber } = req.body;
-  const hashedPassword = bcryptjs.hashSync(password, 10);
-  const newUser = new User({ username, email, password: hashedPassword, studentRegNumber });
-
+  const { username, email, password, regNumber, role } = req.body;
   try {
+    const hashedPassword = bcryptjs.hashSync(password, 10);
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      regNumber,
+      role,
+    });
     await newUser.save();
-    res.status(201).json({ message: "User created successfully" });
+    const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET);
+    const { password: pass, ...rest } = newUser._doc;
+    res
+      .cookie("token", token, { httpOnly: true })
+      .status(201)
+      .json({ token, user: rest });
   } catch (error) {
-    if (error.code === 11000) {
-      res.status(400).json({ message: "User already exists" });
-    } else {
-      res.status(500).json({ message: error.message });
-    }
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -32,28 +38,20 @@ export const login = async (req, res) => {
       res.status(401).json({ message: "Invalid password" });
       return;
     }
-    const token = jwt.sign({ id: validuser._id }, process.env.JWT_SECRET)
-    const {password:pass, ...rest} = validuser._doc;
+    const token = jwt.sign({ id: validuser._id, role: validuser.role }, process.env.JWT_SECRET);
+    const { password: pass, ...rest } = validuser._doc;
     res
-    .cookie("token", token, { httpOnly: true})
-    .status(200)
-    .json(rest);
-    
-  }
-  catch (error) {
+      .cookie("token", token, { httpOnly: true })
+      .status(200)
+      .json({ token, user: rest });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 export const getBorrowedItems = async (req, res) => {
   const { userId } = req.params;
-
   try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
     const borrowedItems = await Equipment.find({ 'borrowedBy.userId': userId })
       .select('name category borrowedBy')
       .lean();
@@ -69,3 +67,4 @@ export const getBorrowedItems = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+

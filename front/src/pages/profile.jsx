@@ -59,7 +59,7 @@ export default function Profile() {
         <strong>Email:</strong> {currentUser.email}
       </Typography>
       <Typography variant="body1">
-        <strong>Student Registration Number:</strong> {currentUser.studentRegNumber}
+        <strong>Registration Number:</strong> {currentUser.regNumber}
       </Typography>
       <Button variant="contained" color="primary" onClick={handleLogout} sx={{ marginTop: 2 }}>
         Log Out
