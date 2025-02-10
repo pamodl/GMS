@@ -70,17 +70,36 @@ export const getLastSevenDaysCheckInData = async (req, res) => {
       {
         $group: {
           _id: {
-            $dateToString: { format: "%m-%d", date: "$checkInTime" }
+            date: { $dateToString: { format: "%m-%d", date: "$checkInTime" } },
+            hour: { $hour: "$checkInTime" }
           },
           count: { $sum: 1 }
         }
       },
       {
-        $sort: { _id: 1 }
+        $sort: { "_id.date": 1, "_id.hour": 1 }
       }
     ]);
 
-    res.json(checkInData);
+    // Generate a complete list of date-hour combinations for the last seven days
+    const completeData = [];
+    for (let d = new Date(sevenDaysAgo); d <= new Date(); d.setDate(d.getDate() + 1)) {
+      for (let h = 0; h < 24; h++) {
+        const monthDay = d.toISOString().split('T')[0].slice(5); // Extract MM-DD
+        completeData.push({
+          dateHour: `${monthDay} ${h}:00`,
+          count: 0
+        });
+      }
+    }
+
+    // Merge the aggregated data with the complete list
+    const mergedData = completeData.map(item => {
+      const found = checkInData.find(data => `${data._id.date} ${data._id.hour}:00` === item.dateHour);
+      return found ? { ...item, count: found.count } : item;
+    });
+
+    res.json(mergedData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

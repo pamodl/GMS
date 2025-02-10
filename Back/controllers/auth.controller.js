@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import Equipment from "../models/equipment.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 export const signup = async (req, res) => {
@@ -43,3 +44,28 @@ export const login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 }
+
+export const getBorrowedItems = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const borrowedItems = await Equipment.find({ 'borrowedBy.userId': userId })
+      .select('name category borrowedBy')
+      .lean();
+
+    // Filter the borrowedBy array to only include entries for the specified user
+    const filteredItems = borrowedItems.map(item => ({
+      ...item,
+      borrowedBy: item.borrowedBy.filter(borrow => borrow.userId.toString() === userId)
+    }));
+
+    res.status(200).json(filteredItems);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
