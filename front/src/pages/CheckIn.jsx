@@ -95,6 +95,20 @@ export default function CheckInOut() {
     return date.toLocaleString();
   };
 
+  const CustomXAxisTick = ({ x, y, payload }) => {
+    const [date, hour] = payload.value.split(' ');
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dy={16} textAnchor="middle" fill="#666">
+          {date}
+        </text>
+        <text x={0} y={20} dy={16} textAnchor="middle" fill="#666">
+          {hour}
+        </text>
+      </g>
+    );
+  };
+
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
       <Card sx={{ maxWidth: 800, width: '100%', padding: 2 }}>
@@ -131,7 +145,7 @@ export default function CheckInOut() {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={checkInData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="_id" />
+                <XAxis dataKey="dateHour" tick={<CustomXAxisTick />} />
                 <YAxis />
                 <Tooltip />
                 <Legend />
