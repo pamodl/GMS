@@ -76,14 +76,16 @@ export default function Profile() {
           <Typography variant="body1">No borrowed items.</Typography>
         ) : (
           <List>
-            {borrowedItems.map((item) => (
-              <ListItem key={item._id}>
-                <ListItemText
-                  primary={item.name}
-                  secondary={`Borrowed on: ${new Date(item.borrowedBy[0].borrowedAt).toLocaleString()}`}
-                />
-              </ListItem>
-            ))}
+            {borrowedItems.map((item) =>
+              item.borrowedBy.map((borrow) => (
+                <ListItem key={borrow._id}>
+                  <ListItemText
+                    primary={item.name}
+                    secondary={`Borrowed on: ${new Date(borrow.borrowedAt).toLocaleString()}`}
+                  />
+                </ListItem>
+              ))
+            )}
           </List>
         )}
       </Box>
