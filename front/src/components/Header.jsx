@@ -27,9 +27,11 @@ export default function Header() {
           GymTrac
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button color="inherit" component={Link} to="/manage-equipment">
-            Equipment
-          </Button>
+          {currentUser && currentUser.role === 'admin' && (
+            <Button color="inherit" component={Link} to="/admin/manage-equipment">
+              Equipment
+            </Button>
+          )}
           {currentUser ? (
             <>
               <Typography
