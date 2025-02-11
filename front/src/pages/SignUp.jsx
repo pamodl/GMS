@@ -1,6 +1,6 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 export default function SignUp() {
   const [formData, setFormData] = React.useState({
@@ -8,7 +8,8 @@ export default function SignUp() {
     email: '',
     password: '',
     passwordConfirm: '',
-    studentRegNumber: '' 
+    regNumber: '',
+    role: 'student', // Default role
   });
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
@@ -41,12 +42,19 @@ export default function SignUp() {
     });
   };
 
+  const handleRoleChange = (e) => {
+    setFormData({
+      ...formData,
+      role: e.target.value
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const regNumberPattern = /^[A-Za-z]{2}\/\d{4}\/\d{5}$/;
 
-    if (!regNumberPattern.test(formData.studentRegNumber)) {
-      setError('Student Registration Number Not Valid');
+    if (!regNumberPattern.test(formData.regNumber)) {
+      setError('Registration Number Not Valid');
       return;
     }
 
@@ -113,9 +121,9 @@ export default function SignUp() {
 
             <input
               type="text"
-              placeholder='student registration number' // Add this input field
+              placeholder='registration number'
               className='border p-3 rounded-lg'
-              id='studentRegNumber'
+              id='regNumber'
               onChange={handleChange} />
 
             <div className='relative'>
@@ -152,8 +160,19 @@ export default function SignUp() {
               </button>
             </div>
 
+            <select
+              id="role"
+              value={formData.role}
+              onChange={handleRoleChange}
+              className='border p-3 rounded-lg'
+            >
+              <option value="student">Student</option>
+              <option value="academic">Academic</option>
+              <option value="non-academic">Non-Academic</option>
+            </select>
+
             <button
-              disabled={loading || !formData.username || !formData.email || !formData.password || !formData.passwordConfirm || !formData.studentRegNumber} // Add studentRegNumber to the condition
+              disabled={loading || !formData.username || !formData.email || !formData.password || !formData.passwordConfirm || !formData.regNumber}
               className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80 mt-5'>
               {loading ? 'Loading..' : 'Sign Up'}
             </button>
