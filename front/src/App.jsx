@@ -31,7 +31,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/manage-equipment" element={<ManageEquipment />} />
+        <Route path="/admin/manage-equipment" element={<ManageEquipment />} />
         <Route path="/check-in-out" element={<CheckInOut />} />
         <Route path="/view-equipment" element={<ViewEquipment />} />
         <Route path="/profile" element={<Profile />} />
