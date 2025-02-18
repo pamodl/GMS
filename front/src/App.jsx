@@ -11,6 +11,9 @@ import Header from './components/Header';
 import Profile from './pages/profile';
 import AdminDashboard from './components/AdminDashboard';
 import AdminEquipment from './pages/AdminEquipment';
+import BookEquipment from './pages/BookEquipment';
+import ManageBookings from './pages/ManageBookings';
+import UserDashboard from './pages/UserDashboard';
 
 const PrivateRoute = ({ element, roles, ...rest }) => {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -31,13 +34,15 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        
         <Route path="/check-in-out" element={<CheckInOut />} />
         <Route path="/view-equipment" element={<ViewEquipment />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/dashboard" element={<UserDashboard />} />
+        <Route path="/book-equipment" element={<BookEquipment />} />
         <Route path="/admin" element={<PrivateRoute element={<AdminDashboard />} roles={['admin']} />} />
         <Route path="/admin/equipment" element={<PrivateRoute element={<AdminEquipment />} roles={['admin']} />} />
         <Route path="/admin/manage-equipment" element={<PrivateRoute element={<ManageEquipment />} roles={['admin']} />} />
+        <Route path="/admin/manage-bookings" element={<PrivateRoute element={<ManageBookings />} roles={['admin']} />} />
       </Routes>
     </BrowserRouter>
   );

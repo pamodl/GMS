@@ -31,6 +31,24 @@ export default function Home() {
               View Status
             </Link>
           </div>
+
+          {/* Book Equipment */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Book Equipment</h2>
+            <p className="text-gray-600 mb-4">Request to borrow gym equipment</p>
+            <Link to="/book-equipment" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              Book Equipment
+            </Link>
+          </div>
+
+          {/* User Dashboard */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">User Dashboard</h2>
+            <p className="text-gray-600 mb-4">View your activity and borrowed equipment</p>
+            <Link to="/dashboard" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              User Dashboard
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -5,6 +5,7 @@ import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
 import checkinoutRouter from './routes/checkinout.route.js';
 import equipmentRouter from './routes/equipment.route.js'; // Import the equipment routes
+import bookingRouter from './routes/booking.route.js'; // Import the booking routes
 
 dotenv.config();
 
@@ -30,3 +31,4 @@ app.use("/Back/user", userRouter);
 app.use("/Back/auth", authRouter);
 app.use("/Back/checkinout", checkinoutRouter);
 app.use('/Back/equipment', equipmentRouter); // Add the equipment routes
+app.use('/Back/bookings', bookingRouter); // Add the booking routes
