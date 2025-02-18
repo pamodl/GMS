@@ -10,6 +10,10 @@ const borrowedSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  quantity: {
+    type: Number,
+    required: true,
+  },
 });
 
 const equipmentSchema = new mongoose.Schema({
