@@ -14,6 +14,8 @@ import AdminEquipment from './pages/AdminEquipment';
 import BookEquipment from './pages/BookEquipment';
 import ManageBookings from './pages/ManageBookings';
 import UserDashboard from './pages/UserDashboard';
+import SendNotices from './pages/SendNotices'; // Import Send Notices page
+import Notices from './pages/Notices'; // Import Notices page
 
 const PrivateRoute = ({ element, roles, ...rest }) => {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -43,6 +45,9 @@ export default function App() {
         <Route path="/admin/equipment" element={<PrivateRoute element={<AdminEquipment />} roles={['admin']} />} />
         <Route path="/admin/manage-equipment" element={<PrivateRoute element={<ManageEquipment />} roles={['admin']} />} />
         <Route path="/admin/manage-bookings" element={<PrivateRoute element={<ManageBookings />} roles={['admin']} />} />
+        <Route path="/admin/send-notices" element={<PrivateRoute element={<SendNotices />} roles={['admin']} />} />
+        <Route path="/notices" element={<PrivateRoute element={<Notices />} />} />
+        
       </Routes>
     </BrowserRouter>
   );

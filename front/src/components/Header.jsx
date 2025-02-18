@@ -1,7 +1,8 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Button, IconButton } from '@mui/material';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import { logoutUserStart, logoutUserSuccess, logoutUserFailure } from '../redux/user/userSlice';
 
 export default function Header() {
@@ -39,6 +40,11 @@ export default function Header() {
           )}
           {currentUser ? (
             <>
+              {currentUser.role !== 'admin' && (
+                <IconButton color="inherit" component={Link} to="/notices">
+                  <NotificationsIcon />
+                </IconButton>
+              )}
               <Typography
                 variant="body1"
                 component={Link}
