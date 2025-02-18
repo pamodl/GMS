@@ -11,8 +11,11 @@ export default function AdminDashboard() {
       <Button variant="contained" color="primary" component={Link} to="/admin/equipment" sx={{ marginRight: 2 }}>
         Manage Equipment
       </Button>
-      <Button variant="contained" color="secondary" component={Link} to="/admin/manage-bookings">
+      <Button variant="contained" color="secondary" component={Link} to="/admin/manage-bookings" sx={{ marginRight: 2 }}>
         Manage Bookings
+      </Button>
+      <Button variant="contained" color="default" component={Link} to="/admin/send-notices">
+        Send Notices
       </Button>
       {/* Add other admin functionalities here */}
     </Box>
