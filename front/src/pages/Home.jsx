@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom'
 export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="bg-blue-600 text-white py-16">
+      <header className="bg-blue-900 text-white py-16">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-4">University Gymnasium Management System</h1>
-          <p className="text-xl">Digital Solution for Gymnasium Management</p>
+          <h1 className="text-5xl font-bold mb-4 text-center">University Gymnasium Management System</h1>
+          <p className="text-xl text-center">Digital Solution for Gymnasium Management</p>
         </div>
       </header>
 
