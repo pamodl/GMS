@@ -17,6 +17,9 @@ export default function AdminDashboard() {
       <Button variant="contained" color="default" component={Link} to="/admin/send-notices">
         Send Notices
       </Button>
+      <Button variant="contained" color="success" component={Link} to="/admin/returns">
+         Manage Returns
+    </Button>
       {/* Add other admin functionalities here */}
     </Box>
   );
