@@ -35,8 +35,6 @@ export default function Profile() {
     dispatch(logoutUserStart());
     try {
       // Perform any necessary logout logic here, such as API calls
-      // For example:
-      // await api.logout();
       dispatch(logoutUserSuccess());
     } catch (error) {
       dispatch(logoutUserFailure(error.message));
@@ -81,7 +79,7 @@ export default function Profile() {
                 <ListItem key={borrow._id}>
                   <ListItemText
                     primary={item.name}
-                    secondary={`Borrowed on: ${new Date(borrow.borrowedAt).toLocaleString()}`}
+                    secondary={`Borrowed on: ${new Date(borrow.borrowedAt).toLocaleString()} - Quantity: ${borrow.quantity}`}
                   />
                 </ListItem>
               ))
