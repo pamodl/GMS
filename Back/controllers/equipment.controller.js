@@ -80,9 +80,9 @@ export const deleteEquipment = async (req, res) => {
 };
 
 export const approveReturn = async (req, res) => {
-  const { itemId, borrowId } = req.body;
+  const { itemId, userId } = req.body;
 
-  console.log('Approve request received:', { itemId, borrowId }); // Debugging log
+  console.log('Approve request received:', { itemId, userId }); // Debugging log
 
   try {
     const equipment = await Equipment.findById(itemId);
@@ -93,28 +93,20 @@ export const approveReturn = async (req, res) => {
 
     console.log('Equipment found:', equipment); // Debugging log
 
-    const borrowRecord = equipment.borrowedBy.find(
-      (borrow) => borrow._id.toString() === borrowId
+    const borrowRecords = equipment.borrowedBy.filter(
+      (borrow) => borrow.userId.toString() === userId && borrow.returnedAt !== null && !borrow.isApproved
     );
 
-    if (!borrowRecord) {
-      console.log('Borrow record not found'); // Debugging log
-      return res.status(400).json({ message: 'No borrow record found' });
+    if (borrowRecords.length === 0) {
+      console.log('No pending returns found for this user'); // Debugging log
+      return res.status(400).json({ message: 'No pending returns found for this user' });
     }
 
-    if (!borrowRecord.returnedAt) {
-      console.log('Return not initiated by user'); // Debugging log
-      return res.status(400).json({ message: 'Return not initiated by user' });
-    }
-
-    if (borrowRecord.isApproved) {
-      console.log('Borrow record already approved'); // Debugging log
-      return res.status(400).json({ message: 'This return has already been approved' });
-    }
-
-    // Approve the return
-    borrowRecord.isApproved = true;
-    equipment.available += borrowRecord.quantity;
+    // Approve all pending returns for this user
+    borrowRecords.forEach((borrow) => {
+      borrow.isApproved = true;
+      equipment.available += borrow.quantity;
+    });
 
     await equipment.save();
 
@@ -134,17 +126,32 @@ export const getPendingReturns = async (req, res) => {
       'borrowedBy.isApproved': false, // Only include records where isApproved is false
     });
 
-    // Map the equipment to include only the relevant borrow records
-    const pendingReturns = equipment.map((item) => ({
-      _id: item._id,
-      name: item.name,
-      category: item.category,
-      borrowedBy: item.borrowedBy.filter(
-        (borrow) => borrow.returnedAt !== null && borrow.isApproved === false
-      ),
-    }));
+    // Group borrow records by userId and itemId
+    const pendingReturns = equipment.map((item) => {
+      const groupedBorrowedBy = item.borrowedBy.reduce((acc, borrow) => {
+        if (borrow.returnedAt !== null && !borrow.isApproved) {
+          const key = `${borrow.userId}-${item._id}`;
+          if (!acc[key]) {
+            acc[key] = {
+              userId: borrow.userId,
+              itemId: item._id,
+              itemName: item.name,
+              category: item.category,
+              totalQuantity: 0,
+              borrowedRecords: [],
+            };
+          }
+          acc[key].totalQuantity += borrow.quantity;
+          acc[key].borrowedRecords.push(borrow);
+        }
+        return acc;
+      }, {});
 
-    res.status(200).json(pendingReturns);
+      return Object.values(groupedBorrowedBy);
+    });
+
+    // Flatten the grouped results
+    res.status(200).json(pendingReturns.flat());
   } catch (error) {
     console.error('Error in getPendingReturns:', error.message); // Debugging log
     res.status(500).json({ message: error.message });
