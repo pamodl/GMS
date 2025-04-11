@@ -11,7 +11,8 @@ export default function SendNotices() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/Back/notices/create', { title, message });
+      // Include the "public" field and set it to true
+      const response = await axios.post('/Back/notices/create', { title, message, public: true });
       setSuccess('Notice sent successfully');
       setTitle('');
       setMessage('');
