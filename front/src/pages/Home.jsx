@@ -11,6 +11,7 @@ export default function Home() {
   }, []);
 
   return (
+
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <motion.header 
         className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-20 shadow-lg"
@@ -35,6 +36,7 @@ export default function Home() {
           >
             Streamlining gym access, equipment management, and attendance tracking
           </motion.p>
+
         </div>
       </motion.header>
 
