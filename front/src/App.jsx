@@ -17,6 +17,9 @@ import UserDashboard from './pages/UserDashboard';
 import SendNotices from './pages/SendNotices'; // Import Send Notices page
 import Notices from './pages/Notices'; // Import Notices page
 import AdminReturns from './pages/AdminReturns'; // Import Admin Returns page
+import AdminBorrowedItems from './pages/AdminBorrowedItems'; // Import the new page
+import AdminCurrentBorrowedItems from './pages/AdminCurrentBorrowedItems'; // Import the new page
+
 
 const PrivateRoute = ({ element, roles, ...rest }) => {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -49,6 +52,8 @@ export default function App() {
         <Route path="/admin/send-notices" element={<PrivateRoute element={<SendNotices />} roles={['admin']} />} />
         <Route path="/notices" element={<PrivateRoute element={<Notices />} />} />
         <Route path="/admin/returns" element={<PrivateRoute element={<AdminReturns />} roles={['admin']} />} /> 
+        <Route path="/admin/current-borrowed-items" element={<PrivateRoute element={<AdminCurrentBorrowedItems />} roles={['admin']} />}/>
+        <Route path="/admin/borrowed-items" element={<PrivateRoute element={<AdminBorrowedItems />} roles={['admin']} />} />
       </Routes>
     </BrowserRouter>
   );

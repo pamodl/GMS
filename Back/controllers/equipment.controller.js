@@ -1,5 +1,6 @@
 import Equipment from '../models/equipment.model.js';
 import User from '../models/user.model.js';
+import Notice from '../models/notice.model.js';
 
 export const getAllEquipment = async (req, res) => {
   try {
@@ -154,6 +155,99 @@ export const getPendingReturns = async (req, res) => {
     res.status(200).json(pendingReturns.flat());
   } catch (error) {
     console.error('Error in getPendingReturns:', error.message); // Debugging log
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const sendReturnNotice = async (req, res) => {
+  const { userId, itemId } = req.body;
+
+  try {
+    // Fetch the user and item details
+    const user = await User.findById(userId);
+    const equipment = await Equipment.findById(itemId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (!equipment) {
+      return res.status(404).json({ message: 'Equipment not found' });
+    }
+
+    // Create a new notice
+    const newNotice = new Notice({
+      title: `Return Reminder for ${equipment.name}`,
+      message: `Please return the borrowed item "${equipment.name}".`,
+      userId: user._id, // Associate the notice with the user
+      public: false, // Mark the notice as private
+    });
+
+    await newNotice.save(); // Save the notice to the database
+
+    console.log(`Notice saved for user ${user.email} regarding item: ${equipment.name}`);
+    res.status(200).json({ message: `Notice sent to ${user.email} for item: ${equipment.name}` });
+  } catch (error) {
+    console.error('Error in sendReturnNotice:', error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getCurrentBorrowedItems = async (req, res) => {
+  try {
+    // Fetch all equipment with currently borrowed records
+    const equipment = await Equipment.find({ 'borrowedBy.returnedAt': null }).populate(
+      'borrowedBy.userId',
+      'username email'
+    );
+
+    // Transform the data to include detailed information
+    const currentBorrowedItems = equipment.map((item) => ({
+      itemId: item._id,
+      itemName: item.name,
+      category: item.category,
+      borrowedBy: item.borrowedBy
+        .filter((borrow) => borrow.returnedAt === null) // Only include currently borrowed records
+        .map((borrow) => ({
+          userId: borrow.userId._id,
+          username: borrow.userId.username,
+          email: borrow.userId.email,
+          borrowedAt: borrow.borrowedAt,
+          quantity: borrow.quantity,
+        })),
+    }));
+
+    res.status(200).json(currentBorrowedItems);
+  } catch (error) {
+    console.error('Error in getCurrentBorrowedItems:', error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getBorrowedItems = async (req, res) => {
+  try {
+    // Fetch all equipment with borrowed records
+    const equipment = await Equipment.find({ 'borrowedBy.0': { $exists: true } }).populate('borrowedBy.userId', 'username email');
+
+    // Transform the data to include detailed information
+    const borrowedItems = equipment.map((item) => ({
+      itemId: item._id,
+      itemName: item.name,
+      category: item.category,
+      borrowedBy: item.borrowedBy.map((borrow) => ({
+        userId: borrow.userId._id,
+        username: borrow.userId.username,
+        email: borrow.userId.email,
+        borrowedAt: borrow.borrowedAt,
+        returnedAt: borrow.returnedAt,
+        quantity: borrow.quantity,
+        isApproved: borrow.isApproved,
+      })),
+    }));
+
+    res.status(200).json(borrowedItems);
+  } catch (error) {
+    console.error('Error in getBorrowedItems:', error.message);
     res.status(500).json({ message: error.message });
   }
 };

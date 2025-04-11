@@ -9,10 +9,20 @@ const noticeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false, // Optional for public notices
+  },
+  public: {
+    type: Boolean,
+    default: false, // Default to false (not public)
+  },
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  
 });
 
 const Notice = mongoose.model('Notice', noticeSchema);
