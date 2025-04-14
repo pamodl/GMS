@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Typography, Button, Grid, Card, CardContent } from '@mui/material';
+import QrCodeIcon from '@mui/icons-material/QrCode'; // Import QR code icon
 
 export default function AdminDashboard() {
   return (
@@ -101,6 +102,28 @@ export default function AdminDashboard() {
                 fullWidth
               >
                 Send Notices
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* QR Code Management Section */}
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Attendance Management
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                component={Link}
+                to="/admin/qr-code"
+                startIcon={<QrCodeIcon />}
+                sx={{ marginBottom: 1 }}
+                fullWidth
+              >
+                Generate Check-In QR Code
               </Button>
             </CardContent>
           </Card>

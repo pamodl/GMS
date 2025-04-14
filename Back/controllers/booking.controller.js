@@ -69,3 +69,30 @@ export const updateBookingStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getBookingsByUser = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Fetch bookings for the specified user
+    const bookings = await Booking.find({ user: userId })
+      .populate('equipment', 'name category') // Populate equipment details
+      .lean();
+
+    // Format the response to include booking details
+    const formattedBookings = bookings.map(booking => ({
+      equipmentName: booking.equipment.name,
+      category: booking.equipment.category,
+      quantity: booking.quantity,
+      status: booking.status,
+      requestedAt: booking.requestedAt,
+      approvedAt: booking.approvedAt,
+      rejectedAt: booking.rejectedAt,
+    }));
+
+    res.status(200).json(formattedBookings);
+  } catch (error) {
+    console.error('Error fetching bookings:', error.message);
+    res.status(500).json({ message: error.message });
+  }
+};

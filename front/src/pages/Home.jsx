@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useSelector } from 'react-redux';
 
 export default function Home() {
   const [loaded, setLoaded] = useState(false);
+  // Get current user from Redux state
+  const { currentUser } = useSelector((state) => state.user);
   
   // Set loaded to true after component mounts for animations
   useEffect(() => {
@@ -11,7 +14,6 @@ export default function Home() {
   }, []);
 
   return (
-
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <motion.header 
         className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-20 shadow-lg"
@@ -170,26 +172,51 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <motion.section 
-        className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16 mt-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: loaded ? 1 : 0 }}
-        transition={{ delay: 1.3, duration: 0.8 }}
-      >
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to get started?</h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join our digital gym management system today and enjoy a seamless experience.
-          </p>
-          <Link 
-            to="/register" 
-            className="bg-white text-blue-600 px-8 py-4 rounded-lg font-medium text-lg inline-block hover:bg-blue-50 transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
-          >
-            Create an Account
-          </Link>
-        </div>
-      </motion.section>
+      {/* Call to Action - only show if not logged in */}
+      {!currentUser && (
+        <motion.section 
+          className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16 mt-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: loaded ? 1 : 0 }}
+          transition={{ delay: 1.3, duration: 0.8 }}
+        >
+          <div className="container mx-auto px-6 text-center">
+            <h2 className="text-3xl font-bold mb-6">Ready to get started?</h2>
+            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+              Join our digital gym management system today and enjoy a seamless experience.
+            </p>
+            <Link 
+              to="/signup" 
+              className="bg-white text-blue-600 px-8 py-4 rounded-lg font-medium text-lg inline-block hover:bg-blue-50 transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+            >
+              Create an Account
+            </Link>
+          </div>
+        </motion.section>
+      )}
+
+      {/* Alternative CTA for logged-in users */}
+      {currentUser && (
+        <motion.section 
+          className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16 mt-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: loaded ? 1 : 0 }}
+          transition={{ delay: 1.3, duration: 0.8 }}
+        >
+          <div className="container mx-auto px-6 text-center">
+            <h2 className="text-3xl font-bold mb-6">Welcome back, {currentUser.username}!</h2>
+            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+              Access all your gym features and manage your activities.
+            </p>
+            <Link 
+              to="/dashboard" 
+              className="bg-white text-blue-600 px-8 py-4 rounded-lg font-medium text-lg inline-block hover:bg-blue-50 transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+            >
+              Go to Dashboard
+            </Link>
+          </div>
+        </motion.section>
+      )}
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
