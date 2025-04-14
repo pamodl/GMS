@@ -19,7 +19,8 @@ import Notices from './pages/Notices'; // Import Notices page
 import AdminReturns from './pages/AdminReturns'; // Import Admin Returns page
 import AdminBorrowedItems from './pages/AdminBorrowedItems'; // Import the new page
 import AdminCurrentBorrowedItems from './pages/AdminCurrentBorrowedItems'; // Import the new page
-
+import AdminCreateEquipment from './pages/AdminCreateEquipment'; // Import the new component
+import AdminQRCode from './pages/AdminQRCode';
 
 const PrivateRoute = ({ element, roles, ...rest }) => {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -54,6 +55,8 @@ export default function App() {
         <Route path="/admin/returns" element={<PrivateRoute element={<AdminReturns />} roles={['admin']} />} /> 
         <Route path="/admin/current-borrowed-items" element={<PrivateRoute element={<AdminCurrentBorrowedItems />} roles={['admin']} />}/>
         <Route path="/admin/borrowed-items" element={<PrivateRoute element={<AdminBorrowedItems />} roles={['admin']} />} />
+        <Route path="/admin/equipment/create" element={<PrivateRoute element={<AdminCreateEquipment />} roles={['admin']} />} /> 
+        <Route path="/admin/qr-code" element={<PrivateRoute element={<AdminQRCode />} roles={['admin']} />} />
       </Routes>
     </BrowserRouter>
   );

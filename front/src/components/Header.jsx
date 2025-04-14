@@ -34,6 +34,11 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { logoutUserStart, logoutUserSuccess, logoutUserFailure } from '../redux/user/userSlice';
 
+// Define Figtree font style to be used throughout the component
+const figtreeFont = {
+  fontFamily: 'Figtree, sans-serif'
+};
+
 export default function Header() {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -77,9 +82,9 @@ export default function Header() {
       open={mobileDrawerOpen}
       onClose={toggleMobileDrawer}
     >
-      <Box sx={{ width: 250, pt: 2 }}>
+      <Box sx={{ width: 250, pt: 2, ...figtreeFont }}>
         <Box display="flex" alignItems="center" justifyContent="space-between" px={2} mb={1}>
-          <Typography variant="h6" color="primary">GymTrac</Typography>
+          <Typography variant="h6" color="primary" sx={figtreeFont}>GymTrac</Typography>
           <IconButton onClick={toggleMobileDrawer}>
             <ChevronLeftIcon />
           </IconButton>
@@ -93,8 +98,8 @@ export default function Header() {
                 {currentUser.username.charAt(0).toUpperCase()}
               </Avatar>
               <Box>
-                <Typography variant="subtitle1">{currentUser.username}</Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="subtitle1" sx={figtreeFont}>{currentUser.username}</Typography>
+                <Typography variant="body2" color="text.secondary" sx={figtreeFont}>
                   {currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)}
                 </Typography>
               </Box>
@@ -108,18 +113,18 @@ export default function Header() {
             <>
               <ListItem button component={Link} to="/admin" selected={isActive('/admin')}>
                 <ListItemIcon><DashboardIcon /></ListItemIcon>
-                <ListItemText primary="Admin Dashboard" />
+                <ListItemText primary="Admin Dashboard" sx={figtreeFont} />
               </ListItem>
               <ListItem button component={Link} to="/admin/manage-equipment" selected={isActive('/admin/manage-equipment')}>
                 <ListItemIcon><FitnessCenterIcon /></ListItemIcon>
-                <ListItemText primary="Equipment" />
+                <ListItemText primary="Equipment" sx={figtreeFont} />
               </ListItem>
             </>
           ) : (
             <>
               <ListItem button component={Link} to="/" selected={isActive('/')}>
                 <ListItemIcon><DashboardIcon /></ListItemIcon>
-                <ListItemText primary="Dashboard" />
+                <ListItemText primary="Dashboard" sx={figtreeFont} />
               </ListItem>
               {currentUser && (
                 <ListItem button component={Link} to="/notices" selected={isActive('/notices')}>
@@ -128,7 +133,7 @@ export default function Header() {
                       <NotificationsIcon />
                     </Badge>
                   </ListItemIcon>
-                  <ListItemText primary="Notices" />
+                  <ListItemText primary="Notices" sx={figtreeFont} />
                 </ListItem>
               )}
             </>
@@ -138,22 +143,22 @@ export default function Header() {
             <>
               <ListItem button component={Link} to="/profile" selected={isActive('/profile')}>
                 <ListItemIcon><AccountCircleIcon /></ListItemIcon>
-                <ListItemText primary="Profile" />
+                <ListItemText primary="Profile" sx={figtreeFont} />
               </ListItem>
               <ListItem button onClick={handleLogout}>
                 <ListItemIcon><LogoutIcon /></ListItemIcon>
-                <ListItemText primary="Log Out" />
+                <ListItemText primary="Log Out" sx={figtreeFont} />
               </ListItem>
             </>
           ) : (
             <>
               <ListItem button component={Link} to="/login" selected={isActive('/login')}>
                 <ListItemIcon><LoginIcon /></ListItemIcon>
-                <ListItemText primary="Log In" />
+                <ListItemText primary="Log In" sx={figtreeFont} />
               </ListItem>
               <ListItem button component={Link} to="/signup" selected={isActive('/signup')}>
                 <ListItemIcon><PersonAddIcon /></ListItemIcon>
-                <ListItemText primary="Sign Up" />
+                <ListItemText primary="Sign Up" sx={figtreeFont} />
               </ListItem>
             </>
           )}
@@ -169,7 +174,8 @@ export default function Header() {
         elevation={1}
         sx={{
           backgroundColor: 'white',
-          color: 'text.primary'
+          color: 'text.primary',
+          ...figtreeFont
         }}
       >
         <Container maxWidth="xl">
@@ -195,14 +201,15 @@ export default function Header() {
                 textDecoration: 'none', 
                 color: 'primary.main',
                 fontWeight: 'bold',
-                mr: { md: 4 }
+                mr: { md: 4 },
+                ...figtreeFont
               }}
             >
               GymTrac
             </Typography>
 
             {!isMobile && (
-              <Box sx={{ display: 'flex', flexGrow: 1, gap: 1 }}>
+              <Box sx={{ display: 'flex', flexGrow: 1, gap: 1, ...figtreeFont }}>
                 {currentUser?.role === 'admin' && (
                   <>
                     <Button 
@@ -212,6 +219,7 @@ export default function Header() {
                       sx={{ 
                         borderRadius: 2,
                         px: 2,
+                        ...figtreeFont,
                         ...(isActive('/admin') && {
                           backgroundColor: 'action.selected'
                         })
@@ -226,6 +234,7 @@ export default function Header() {
                       sx={{ 
                         borderRadius: 2,
                         px: 2,
+                        ...figtreeFont,
                         ...(isActive('/admin/manage-equipment') && {
                           backgroundColor: 'action.selected'
                         })
@@ -238,7 +247,7 @@ export default function Header() {
               </Box>
             )}
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ...figtreeFont }}>
               {currentUser ? (
                 <>
                   {currentUser.role !== 'admin' && !isMobile && (
@@ -271,6 +280,7 @@ export default function Header() {
                           </Avatar>
                         }
                         endIcon={null}
+                        sx={figtreeFont}
                       >
                         {currentUser.username}
                       </Button>
@@ -282,20 +292,20 @@ export default function Header() {
                         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                         PaperProps={{
                           elevation: 3,
-                          sx: { mt: 1, width: 200 }
+                          sx: { mt: 1, width: 200, ...figtreeFont }
                         }}
                       >
                         <MenuItem 
                           component={Link} 
                           to="/profile" 
                           onClick={handleUserMenuClose}
-                          sx={{ gap: 2 }}
+                          sx={{ gap: 2, ...figtreeFont }}
                         >
                           <AccountCircleIcon fontSize="small" />
                           Profile
                         </MenuItem>
                         <Divider />
-                        <MenuItem onClick={handleLogout} sx={{ gap: 2 }}>
+                        <MenuItem onClick={handleLogout} sx={{ gap: 2, ...figtreeFont }}>
                           <LogoutIcon fontSize="small" />
                           Log Out
                         </MenuItem>
@@ -312,7 +322,7 @@ export default function Header() {
                       component={Link} 
                       to="/login"
                       startIcon={<LoginIcon />}
-                      sx={{ borderRadius: 2 }}
+                      sx={{ borderRadius: 2, ...figtreeFont }}
                     >
                       Log In
                     </Button>
@@ -322,7 +332,7 @@ export default function Header() {
                       component={Link} 
                       to="/signup"
                       startIcon={<PersonAddIcon />}
-                      sx={{ borderRadius: 2 }}
+                      sx={{ borderRadius: 2, ...figtreeFont }}
                     >
                       Sign Up
                     </Button>

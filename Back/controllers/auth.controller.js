@@ -53,7 +53,7 @@ export const getBorrowedItems = async (req, res) => {
   const { userId } = req.params;
   try {
     const borrowedItems = await Equipment.find({ 'borrowedBy.userId': userId })
-      .select('name category borrowedBy')
+      .select('name category borrowedBy') 
       .lean();
 
     // Filter the borrowedBy array to only include entries for the specified user
@@ -64,6 +64,7 @@ export const getBorrowedItems = async (req, res) => {
 
     res.status(200).json(filteredItems);
   } catch (error) {
+    console.error('Error fetching borrowed items:', error.message);
     res.status(500).json({ message: error.message });
   }
 };
