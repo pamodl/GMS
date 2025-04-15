@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 
@@ -12,6 +12,11 @@ export default function Home() {
   useEffect(() => {
     setLoaded(true);
   }, []);
+
+  // Redirect admin users to admin dashboard
+  if (currentUser?.isAdmin || currentUser?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
@@ -195,8 +200,8 @@ export default function Home() {
         </motion.section>
       )}
 
-      {/* Alternative CTA for logged-in users */}
-      {currentUser && (
+      {/* Alternative CTA for logged-in non-admin users */}
+      {currentUser && !currentUser.isAdmin && currentUser.role !== 'admin' && (
         <motion.section 
           className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16 mt-8"
           initial={{ opacity: 0 }}
