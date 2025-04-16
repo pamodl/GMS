@@ -22,6 +22,8 @@ import AdminCurrentBorrowedItems from './pages/AdminCurrentBorrowedItems'; // Im
 import AdminCreateEquipment from './pages/AdminCreateEquipment'; // Import the new component
 import AdminQRCode from './pages/AdminQRCode';
 import AdminEditEquipment from './pages/AdminEditEquipment';
+import AdminEquipmentAnalytics from './pages/AdminEquipmentAnalytics';
+
 
 const PrivateRoute = ({ element, roles, ...rest }) => {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -59,6 +61,7 @@ export default function App() {
         <Route path="/admin/equipment/create" element={<PrivateRoute element={<AdminCreateEquipment />} roles={['admin']} />} /> 
         <Route path="/admin/qr-code" element={<PrivateRoute element={<AdminQRCode />} roles={['admin']} />} />
         <Route path="/admin/edit-equipment/:id" element={<PrivateRoute element={<AdminEditEquipment />} roles={['admin']} />} />
+        <Route path="/admin/equipment-analytics" element={<PrivateRoute element={<AdminEquipmentAnalytics />} roles={['admin']} />} />
       </Routes>
     </BrowserRouter>
   );

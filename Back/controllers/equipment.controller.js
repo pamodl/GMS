@@ -287,3 +287,160 @@ export const getAllEquipmentWithBorrowedInfo = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getEquipmentAnalytics = async (req, res) => {
+  const { timeframe, startDate, endDate } = req.query;
+  
+  try {
+    let dateFilter = {};
+    
+    // Set date filter based on timeframe
+    if (timeframe === 'custom' && startDate && endDate) {
+      dateFilter = {
+        borrowedAt: {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate)
+        }
+      };
+    } else {
+      // Calculate date range based on timeframe
+      const today = new Date();
+      let pastDate = new Date();
+      
+      switch (timeframe) {
+        case 'week':
+          pastDate.setDate(today.getDate() - 7);
+          break;
+        case 'month':
+          pastDate.setMonth(today.getMonth() - 1);
+          break;
+        case 'year':
+          pastDate.setFullYear(today.getFullYear() - 1);
+          break;
+        default:
+          pastDate.setMonth(today.getMonth() - 1); // Default to last month
+      }
+      
+      dateFilter = {
+        borrowedAt: {
+          $gte: pastDate,
+          $lte: today
+        }
+      };
+    }
+
+    // Get equipment with borrowed history that matches the date filter
+    const equipment = await Equipment.find({ 
+      'borrowedBy.borrowedAt': { 
+        $gte: dateFilter.borrowedAt.$gte, 
+        $lte: dateFilter.borrowedAt.$lte 
+      } 
+    }).populate('borrowedBy.userId', 'username email registrationNumber');
+
+    // Prepare data for most borrowed equipment
+    const equipmentUsageMap = {};
+    
+    // Prepare data for category usage
+    const categoryUsageMap = {};
+    
+    // Prepare data for usage over time
+    const timeframeDataMap = {};
+
+    // Process all borrowing records
+    equipment.forEach(item => {
+      // Only consider borrows within the date range
+      const relevantBorrows = item.borrowedBy.filter(borrow => 
+        borrow.borrowedAt >= dateFilter.borrowedAt.$gte &&
+        borrow.borrowedAt <= dateFilter.borrowedAt.$lte
+      );
+
+      // Process equipment usage
+      if (!equipmentUsageMap[item.name]) {
+        equipmentUsageMap[item.name] = {
+          name: item.name,
+          borrowCount: 0,
+          quantityBorrowed: 0
+        };
+      }
+      
+      equipmentUsageMap[item.name].borrowCount += relevantBorrows.length;
+      
+      // Add up all quantities borrowed
+      const totalQuantity = relevantBorrows.reduce(
+        (total, borrow) => total + (borrow.quantity || 1), 0
+      );
+      equipmentUsageMap[item.name].quantityBorrowed += totalQuantity;
+
+      // Process category usage - now tracking quantity
+      if (!categoryUsageMap[item.category]) {
+        categoryUsageMap[item.category] = {
+          name: item.category,
+          count: 0,
+          value: 0
+        };
+      }
+      categoryUsageMap[item.category].count += relevantBorrows.length;
+      categoryUsageMap[item.category].value += totalQuantity;
+
+      // Process usage over time - now tracking quantity
+      relevantBorrows.forEach(borrow => {
+        const borrowDate = borrow.borrowedAt.toISOString().split('T')[0]; // YYYY-MM-DD format
+        const borrowQuantity = borrow.quantity || 1; // Default to 1 if quantity not specified
+        
+        if (!timeframeDataMap[borrowDate]) {
+          timeframeDataMap[borrowDate] = {
+            date: borrowDate,
+            borrowCount: 0,
+            returnCount: 0,
+            quantityBorrowed: 0,
+            quantityReturned: 0
+          };
+        }
+        
+        timeframeDataMap[borrowDate].borrowCount += 1;
+        timeframeDataMap[borrowDate].quantityBorrowed += borrowQuantity;
+        
+        // If item was returned, count it for the return date
+        if (borrow.returnedAt) {
+          const returnDate = borrow.returnedAt.toISOString().split('T')[0];
+          
+          if (!timeframeDataMap[returnDate]) {
+            timeframeDataMap[returnDate] = {
+              date: returnDate,
+              borrowCount: 0,
+              returnCount: 0,
+              quantityBorrowed: 0,
+              quantityReturned: 0
+            };
+          }
+          
+          timeframeDataMap[returnDate].returnCount += 1;
+          timeframeDataMap[returnDate].quantityReturned += borrowQuantity;
+        }
+      });
+    });
+
+    // Convert map data to arrays for the frontend
+    const equipmentUsage = Object.values(equipmentUsageMap)
+      .sort((a, b) => b.quantityBorrowed - a.quantityBorrowed) // Sort by quantity instead of count
+      .slice(0, 10); // Top 10 most borrowed by quantity
+      
+    // Convert category usage map to array and format for the pie chart
+    const categoryUsage = Object.values(categoryUsageMap);
+    
+    let timeframeData = Object.values(timeframeDataMap);
+    
+    // Sort timeframe data chronologically
+    timeframeData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    res.status(200).json({
+      equipmentUsage,
+      categoryUsage,
+      timeframeData
+    });
+    
+  } catch (error) {
+    console.error('Error generating analytics:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
