@@ -11,7 +11,8 @@ import {
   getBorrowedItems,
   getCurrentBorrowedItems,
   sendReturnNotice,
-  approveReturn, // Import the approveReturn function
+  approveReturn,
+  getEquipmentAnalytics,
 } from '../controllers/equipment.controller.js';
 
 const router = express.Router();
@@ -29,5 +30,6 @@ router.post('/approve-return', approveReturn); // Route to approve returns
 router.get('/borrowed-items', getBorrowedItems); // Route to fetch borrowed items
 router.get('/current-borrowed-items', getCurrentBorrowedItems); // Route to fetch currently borrowed items
 router.post('/send-return-notice', sendReturnNotice); // Route to send return notices
+router.get('/analytics', getEquipmentAnalytics); // Route to fetch equipment usage analytics
 
 export default router;

@@ -16,6 +16,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 // Animation variants
 const containerVariants = {
@@ -254,6 +255,14 @@ export default function AdminDashboard() {
                 delay={200}
               >
                 Manage Returns
+              </ActionButton>
+              <ActionButton 
+                to="/admin/equipment-analytics" 
+                color="info" 
+                icon={<AssessmentIcon />}  // You'll need to import this icon
+                delay={300}
+              >
+                Equipment Analytics
               </ActionButton>
             </DashboardCard>
           </Grid>
