@@ -238,6 +238,7 @@ export const getBorrowedItems = async (req, res) => {
         userId: borrow.userId._id,
         username: borrow.userId.username,
         email: borrow.userId.email,
+        registrationNumber: borrow.registrationNumber, // <-- add this line
         borrowedAt: borrow.borrowedAt,
         returnedAt: borrow.returnedAt,
         quantity: borrow.quantity,
@@ -251,9 +252,8 @@ export const getBorrowedItems = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 export const borrowEquipment = async (req, res) => {
-  const { itemId, userId } = req.body;
+  const { itemId, userId, registrationNumber } = req.body; // <-- get registrationNumber
 
   try {
     const equipment = await Equipment.findById(itemId);
@@ -266,7 +266,11 @@ export const borrowEquipment = async (req, res) => {
     }
 
     equipment.available -= 1;
-    equipment.borrowedBy.push({ userId, borrowedAt: new Date() });
+    equipment.borrowedBy.push({
+      userId,
+      registrationNumber, // <-- save it here
+      borrowedAt: new Date()
+    });
     await equipment.save();
 
     res.status(200).json({ message: 'Equipment borrowed successfully', equipment });

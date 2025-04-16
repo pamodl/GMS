@@ -52,7 +52,7 @@ export default function AdminBorrowedItems() {
     const cats = Array.from(new Set(borrowedItems.map(item => item.category).filter(Boolean)));
     setCategories(cats);
 
-    const eqNames = Array.from(new Set(borrowedItems.map(item => item.name).filter(Boolean)));
+    const eqNames = Array.from(new Set(borrowedItems.map(item => item.itemName).filter(Boolean)));
     setEquipmentNames(eqNames);
 
     // Filtering logic
@@ -62,7 +62,7 @@ export default function AdminBorrowedItems() {
       items = items.filter(item => item.category === categoryFilter);
     }
     if (equipmentFilter) {
-      items = items.filter(item => item.name === equipmentFilter);
+      items = items.filter(item => item.itemName === equipmentFilter);
     }
     if (searchRegNo.trim()) {
       items = items
@@ -313,24 +313,25 @@ export default function AdminBorrowedItems() {
                             }}
                           >
                             <ListItemText
-                              primary={
-                                <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                                  <PersonIcon sx={{ mr: 1, color: 'text.secondary', fontSize: 20 }} />
-                                  <Typography variant="subtitle1" fontWeight="medium" sx={{ mr: 2 }}>
-                                    {borrow.username || 'Unknown User'}
-                                  </Typography>
-                                  <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
-                                    ({borrow.email || 'No email'})
-                                  </Typography>
-                                  {borrow.registrationNumber && (
-                                    <Chip
-                                      label={`Reg No: ${borrow.registrationNumber}`}
-                                      size="small"
-                                      sx={{ ml: 1 }}
-                                    />
-                                  )}
-                                </Box>
-                              }
+                                primary={
+                                  <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                    <PersonIcon sx={{ mr: 1, color: 'text.secondary', fontSize: 20 }} />
+                                    <Typography variant="subtitle1" fontWeight="medium" sx={{ mr: 2 }}>
+                                      {borrow.registrationNumber || 'No Reg No'}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
+                                      ({borrow.email || 'No email'})
+                                    </Typography>
+                                    {/* Optionally, show username as a chip */}
+                                    {borrow.username && (
+                                      <Chip
+                                        label={`User: ${borrow.username}`}
+                                        size="small"
+                                        sx={{ ml: 1 }}
+                                      />
+                                    )}
+                                  </Box>
+                                }
                               secondary={
                                 <Grid container spacing={2} sx={{ mt: 0.5 }}>
                                   <Grid item xs={12} md={6}>
