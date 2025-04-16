@@ -2,3 +2,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* filepath: c:\Users\Lakshan\Documents\GitHub\GMS\front\src\index.css */
+body, html, #root, * {
+    font-family: 'Figtree', 'Roboto', 'Helvetica Neue', Arial, sans-serif !important;
+  }
