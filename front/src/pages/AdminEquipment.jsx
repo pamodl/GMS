@@ -124,7 +124,7 @@ export default function AdminEquipmentList() {
             </Button>
             <Button 
               component={Link} 
-              to="/admin/create-equipment"
+              to="/admin/equipment/create"
               variant="contained" 
               sx={{ borderRadius: '8px' }}
             >
