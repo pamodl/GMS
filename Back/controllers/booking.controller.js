@@ -1,5 +1,7 @@
 import Booking from '../models/booking.model.js';
 import Equipment from '../models/equipment.model.js';
+import User from '../models/user.model.js'; 
+
 
 export const createBooking = async (req, res) => {
   const { userId, equipmentId, quantity } = req.body;
@@ -54,9 +56,16 @@ export const updateBookingStatus = async (req, res) => {
 
       // Update the equipment model
       const equipment = await Equipment.findById(booking.equipment);
+      // Fetch the user to get their registration number
+      const user = await User.findById(booking.user);
+
       if (equipment) {
         equipment.available -= booking.quantity;
-        equipment.borrowedBy.push({ userId: booking.user, quantity: booking.quantity });
+        equipment.borrowedBy.push({
+          userId: booking.user,
+          quantity: booking.quantity,
+          registrationNumber: user?.regNumber || '', // <-- Save registration number
+        });
         await equipment.save();
       }
     } else if (status === 'rejected') {

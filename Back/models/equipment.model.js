@@ -6,6 +6,9 @@ const borrowedSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  registrationNumber: { 
+    type: String,
+  },
   borrowedAt: {
     type: Date,
     default: Date.now,
