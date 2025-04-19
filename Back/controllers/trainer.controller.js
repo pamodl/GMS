@@ -520,3 +520,45 @@ export const rejectSessionRequest = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+export const updateTrainerSchedule = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { schedule } = req.body;
+    
+    console.log(`Updating schedule for trainer ID: ${id}`);
+    
+    if (!schedule || !Array.isArray(schedule)) {
+      return res.status(400).json({ message: 'Invalid schedule format' });
+    }
+    
+    // Validate each schedule item
+    for (const item of schedule) {
+      if (!item.day || !item.startTime || !item.endTime || item.isAvailable === undefined) {
+        return res.status(400).json({ 
+          message: 'Each schedule item must have day, startTime, endTime, and isAvailable' 
+        });
+      }
+    }
+    
+    const trainer = await Trainer.findById(id);
+    
+    if (!trainer) {
+      return res.status(404).json({ message: 'Trainer not found' });
+    }
+    
+    trainer.schedule = schedule;
+    await trainer.save();
+    
+    console.log('Schedule updated successfully');
+    
+    res.status(200).json({
+      message: 'Schedule updated successfully',
+      schedule: trainer.schedule
+    });
+  } catch (err) {
+    console.error('Error updating trainer schedule:', err);
+    res.status(500).json({ message: err.message });
+  }
+};

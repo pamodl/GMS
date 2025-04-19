@@ -75,7 +75,7 @@ export default function TrainerSchedule() {
       )
     );
   };
-
+  
   const saveSchedule = async () => {
     if (!trainer) return;
     
@@ -84,7 +84,13 @@ export default function TrainerSchedule() {
       setError(null);
       setSuccess(null);
       
-      await axios.put(`/Back/trainers/${trainer._id}/schedule`, { schedule });
+      // Debug: Log what we're sending
+      console.log('Sending schedule update:', { schedule });
+      
+      // Use the correct endpoint
+      const response = await axios.put(`/Back/trainers/${trainer._id}/schedule`, { schedule });
+      
+      console.log('Schedule update response:', response.data);
       
       setSuccess('Schedule updated successfully!');
       
@@ -94,7 +100,18 @@ export default function TrainerSchedule() {
       }, 3000);
     } catch (err) {
       console.error('Error saving schedule:', err);
-      setError('Failed to update schedule: ' + (err.response?.data?.message || 'Unknown error'));
+      
+      // More detailed error logging
+      if (err.response) {
+        console.error('Server response:', err.response.status, err.response.data);
+        setError(`Failed to update schedule: ${err.response.data?.message || `Server error (${err.response.status})`}`);
+      } else if (err.request) {
+        console.error('No response received:', err.request);
+        setError('Failed to update schedule: No server response. Check your connection.');
+      } else {
+        console.error('Request error:', err.message);
+        setError(`Failed to update schedule: ${err.message}`);
+      }
     } finally {
       setSaving(false);
     }
