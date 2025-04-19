@@ -11,7 +11,9 @@ import {
   addSessionFeedback,
   checkTrainerStatus,
   approveSessionRequest,
-  rejectSessionRequest
+  rejectSessionRequest,
+  updateTrainerSchedule
+  
 } from '../controllers/trainer.controller.js';
 import Trainer from '../models/trainer.model.js'; 
 
@@ -46,4 +48,6 @@ router.post('/session/:sessionId/feedback', addSessionFeedback);
 router.get('/check/:userId', checkTrainerStatus);
 router.put('/session/:sessionId/approve', approveSessionRequest);
 router.put('/session/:sessionId/reject', rejectSessionRequest);
+router.put('/:id/schedule', updateTrainerSchedule);
+
 export default router;
