@@ -17,7 +17,8 @@ import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-
+import PeopleIcon from '@mui/icons-material/People';
+import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -299,6 +300,29 @@ export default function AdminDashboard() {
               </ActionButton>
             </DashboardCard>
           </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+          <DashboardCard 
+            title="Trainer Management" 
+            icon={<SportsMartialArtsIcon color="primary" fontSize="medium" />}
+          >
+            <ActionButton 
+              to="/admin/trainers" 
+              color="primary" 
+              icon={<PeopleIcon />}
+              delay={100}
+            >
+              Manage Trainers
+            </ActionButton>
+            <ActionButton 
+              to="/admin/trainers/create" 
+              color="success" 
+              icon={<PersonIcon />}
+              delay={200}
+            >
+              Add New Trainer
+            </ActionButton>
+          </DashboardCard>
+        </Grid>
 
           {/* Notices Section */}
           <Grid item xs={12} md={6} lg={3}>

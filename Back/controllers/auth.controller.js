@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import Trainer from '../models/trainer.model.js';
 import Equipment from "../models/equipment.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -69,3 +70,33 @@ export const getBorrowedItems = async (req, res) => {
   }
 };
 
+export const getUsersNotTrainers = async (req, res) => {
+  try {
+    console.log('Fetching users who are not trainers...');
+    
+    // Get all trainers
+    const trainers = await Trainer.find().select('userId');
+    console.log(`Found ${trainers.length} existing trainers`);
+    
+    const trainerUserIds = trainers.map(trainer => 
+      trainer.userId ? trainer.userId.toString() : null
+    ).filter(Boolean);
+    
+    // Then find all users who aren't in that list
+    // UPDATED: Include all your actual user roles (student, academic, non-academic)
+    const users = await User.find({ 
+      _id: { $nin: trainerUserIds },
+      // Include all roles except admin (if you want to restrict admin from being trainers)
+      // Or include all roles if you want admins to be trainers too
+      role: { $in: ['student', 'academic', 'non-academic'] }
+    }).select('username email regNumber role');
+    
+    console.log(`Found ${users.length} eligible users`);
+    
+    res.status(200).json(users);
+    
+  } catch (error) {
+    console.error('Error in getUsersNotTrainers:', error);
+    res.status(500).json({ message: error.message });
+  }
+};

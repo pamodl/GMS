@@ -23,7 +23,12 @@ import AdminCreateEquipment from './pages/AdminCreateEquipment'; // Import the n
 import AdminQRCode from './pages/AdminQRCode';
 import AdminEditEquipment from './pages/AdminEditEquipment';
 import AdminEquipmentAnalytics from './pages/AdminEquipmentAnalytics';
-
+import AdminTrainersList from './pages/AdminTrainers';
+import AdminCreateTrainer from './pages/AdminCreateTrainer';
+import Trainers from './pages/Trainers';
+import TrainerProfile from './pages/TrainerProfile';
+import TrainerDashboard from './pages/TrainerDashboard';
+import TrainerSchedule from './pages/TrainerSchedule'; 
 
 const PrivateRoute = ({ element, roles, ...rest }) => {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -62,6 +67,13 @@ export default function App() {
         <Route path="/admin/qr-code" element={<PrivateRoute element={<AdminQRCode />} roles={['admin']} />} />
         <Route path="/admin/edit-equipment/:id" element={<PrivateRoute element={<AdminEditEquipment />} roles={['admin']} />} />
         <Route path="/admin/equipment-analytics" element={<PrivateRoute element={<AdminEquipmentAnalytics />} roles={['admin']} />} />
+        <Route path="/admin/trainers" element={<PrivateRoute element={<AdminTrainersList />} roles={['admin']} />} />
+        <Route path="/admin/trainers/create" element={<PrivateRoute element={<AdminCreateTrainer />} roles={['admin']} />} />
+        <Route path="/trainers" element={<Trainers />} />
+        <Route path="/trainers/:id" element={<TrainerProfile />} />
+        <Route path="/trainer/dashboard" element={<TrainerDashboard />} />
+        <Route path="/trainer/schedule" element={<TrainerSchedule />} />
+
       </Routes>
     </BrowserRouter>
   );
