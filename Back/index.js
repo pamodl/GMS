@@ -7,6 +7,7 @@ import checkinoutRouter from './routes/checkinout.route.js';
 import equipmentRouter from './routes/equipment.route.js'; // Import the equipment routes
 import bookingRouter from './routes/booking.route.js'; // Import the booking routes
 import noticeRouter from './routes/notice.route.js'; 
+import trainerRouter from './routes/trainer.route.js';
 
 dotenv.config();
 
@@ -34,3 +35,4 @@ app.use("/Back/checkinout", checkinoutRouter);
 app.use('/Back/equipment', equipmentRouter); // Add the equipment routes
 app.use('/Back/bookings', bookingRouter); // Add the booking routes
 app.use('/Back/notices', noticeRouter);
+app.use('/Back/trainers', trainerRouter);

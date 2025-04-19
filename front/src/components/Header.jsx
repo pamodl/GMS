@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import { 
   AppBar, 
   Toolbar, 
@@ -32,7 +33,9 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { logoutUserStart, logoutUserSuccess, logoutUserFailure } from '../redux/user/userSlice';
+import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
 
 // Define Figtree font style to be used throughout the component
 const figtreeFont = {
@@ -48,6 +51,23 @@ export default function Header() {
   const currentUser = useSelector((state) => state.user.currentUser);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [isTrainer, setIsTrainer] = useState(false);
+  
+  useEffect(() => {
+    const checkTrainerStatus = async () => {
+      if (currentUser && currentUser._id) {
+        try {
+          const response = await axios.get(`/Back/trainers/check/${currentUser._id}`);
+          setIsTrainer(response.data.isTrainer);
+        } catch (error) {
+          console.error('Error checking trainer status:', error);
+          setIsTrainer(false);
+        }
+      }
+    };
+    
+    checkTrainerStatus();
+  }, [currentUser]);
   
   const isActive = (path) => {
     return location.pathname === path;
@@ -57,7 +77,6 @@ export default function Header() {
     handleUserMenuClose();
     dispatch(logoutUserStart());
     try {
-      // Perform any necessary logout logic here, such as API calls
       dispatch(logoutUserSuccess());
     } catch (error) {
       dispatch(logoutUserFailure(error.message));
@@ -100,7 +119,7 @@ export default function Header() {
               <Box>
                 <Typography variant="subtitle1" sx={figtreeFont}>{currentUser.username}</Typography>
                 <Typography variant="body2" color="text.secondary" sx={figtreeFont}>
-                  {currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)}
+                  {isTrainer ? 'Trainer' : currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)}
                 </Typography>
               </Box>
             </Box>
@@ -119,12 +138,35 @@ export default function Header() {
                 <ListItemIcon><FitnessCenterIcon /></ListItemIcon>
                 <ListItemText primary="Equipment" sx={figtreeFont} />
               </ListItem>
+              <ListItem button component={Link} to="/admin/trainers" selected={isActive('/admin/trainers')}>
+                <ListItemIcon><SportsMartialArtsIcon /></ListItemIcon>
+                <ListItemText primary="Trainers" sx={figtreeFont} />
+              </ListItem>
+            </>
+          ) : isTrainer ? (
+            <>
+              <ListItem button component={Link} to="/trainer/dashboard" selected={isActive('/trainer/dashboard')}>
+                <ListItemIcon><DashboardIcon /></ListItemIcon>
+                <ListItemText primary="Trainer Dashboard" sx={figtreeFont} />
+              </ListItem>
+              <ListItem button component={Link} to="/trainer/schedule" selected={isActive('/trainer/schedule')}>
+                <ListItemIcon><CalendarMonthIcon /></ListItemIcon>
+                <ListItemText primary="My Schedule" sx={figtreeFont} />
+              </ListItem>
+              <ListItem button component={Link} to="/" selected={isActive('/')}>
+                <ListItemIcon><FitnessCenterIcon /></ListItemIcon>
+                <ListItemText primary="Equipment" sx={figtreeFont} />
+              </ListItem>
             </>
           ) : (
             <>
               <ListItem button component={Link} to="/" selected={isActive('/')}>
                 <ListItemIcon><DashboardIcon /></ListItemIcon>
                 <ListItemText primary="Dashboard" sx={figtreeFont} />
+              </ListItem>
+              <ListItem button component={Link} to="/trainers" selected={isActive('/trainers')}>
+                <ListItemIcon><SportsMartialArtsIcon /></ListItemIcon>
+                <ListItemText primary="Trainers" sx={figtreeFont} />
               </ListItem>
               {currentUser && (
                 <ListItem button component={Link} to="/notices" selected={isActive('/notices')}>
@@ -210,7 +252,7 @@ export default function Header() {
 
             {!isMobile && (
               <Box sx={{ display: 'flex', flexGrow: 1, gap: 1, ...figtreeFont }}>
-                {currentUser?.role === 'admin' && (
+                {currentUser?.role === 'admin' ? (
                   <>
                     <Button 
                       color="inherit"
@@ -241,6 +283,102 @@ export default function Header() {
                       }}
                     >
                       Equipment
+                    </Button>
+                    <Button 
+                      color="inherit"
+                      component={Link}
+                      to="/admin/trainers"
+                      sx={{ 
+                        borderRadius: 2,
+                        px: 2,
+                        ...figtreeFont,
+                        ...(isActive('/admin/trainers') && {
+                          backgroundColor: 'action.selected'
+                        })
+                      }}
+                    >
+                      Trainers
+                    </Button>
+                  </>
+                ) : isTrainer ? (
+                  <>
+                    <Button 
+                      color="inherit"
+                      component={Link}
+                      to="/trainer/dashboard"
+                      sx={{ 
+                        borderRadius: 2,
+                        px: 2,
+                        ...figtreeFont,
+                        ...(isActive('/trainer/dashboard') && {
+                          backgroundColor: 'action.selected'
+                        })
+                      }}
+                    >
+                      Dashboard
+                    </Button>
+                    <Button 
+                      color="inherit"
+                      component={Link}
+                      to="/trainer/schedule"
+                      sx={{ 
+                        borderRadius: 2,
+                        px: 2,
+                        ...figtreeFont,
+                        ...(isActive('/trainer/schedule') && {
+                          backgroundColor: 'action.selected'
+                        })
+                      }}
+                    >
+                      My Schedule
+                    </Button>
+                    <Button 
+                      color="inherit"
+                      component={Link}
+                      to="/"
+                      sx={{ 
+                        borderRadius: 2,
+                        px: 2,
+                        ...figtreeFont,
+                        ...(isActive('/') && {
+                          backgroundColor: 'action.selected'
+                        })
+                      }}
+                    >
+                      Equipment
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      color="inherit"
+                      component={Link}
+                      to="/"
+                      sx={{ 
+                        borderRadius: 2,
+                        px: 2,
+                        ...figtreeFont,
+                        ...(isActive('/') && {
+                          backgroundColor: 'action.selected'
+                        })
+                      }}
+                    >
+                      Dashboard
+                    </Button>
+                    <Button 
+                      color="inherit"
+                      component={Link}
+                      to="/trainers"
+                      sx={{ 
+                        borderRadius: 2,
+                        px: 2,
+                        ...figtreeFont,
+                        ...(isActive('/trainers') && {
+                          backgroundColor: 'action.selected'
+                        })
+                      }}
+                    >
+                      Trainers
                     </Button>
                   </>
                 )}
