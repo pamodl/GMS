@@ -29,6 +29,7 @@ import Trainers from './pages/Trainers';
 import TrainerProfile from './pages/TrainerProfile';
 import TrainerDashboard from './pages/TrainerDashboard';
 import TrainerSchedule from './pages/TrainerSchedule'; 
+import AdminEditTrainer from './pages/AdminEditTrainer';
 
 const PrivateRoute = ({ element, roles, ...rest }) => {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -73,7 +74,7 @@ export default function App() {
         <Route path="/trainers/:id" element={<TrainerProfile />} />
         <Route path="/trainer/dashboard" element={<TrainerDashboard />} />
         <Route path="/trainer/schedule" element={<TrainerSchedule />} />
-
+        <Route path="/admin/trainers/edit/:id" element={<AdminEditTrainer />} />
       </Routes>
     </BrowserRouter>
   );

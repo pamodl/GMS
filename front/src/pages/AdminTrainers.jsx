@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Typography, Box, Button, CircularProgress, Alert, Paper, 
   Container, List, ListItem, ListItemText, Chip, Divider,
-  Avatar, Rating
+  Avatar, Dialog, DialogActions, DialogContent, DialogTitle
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -15,6 +15,11 @@ export default function AdminTrainersList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionStatus, setActionStatus] = useState({ message: null, severity: null });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [trainerToDelete, setTrainerToDelete] = useState(null);
+  const [deleteInProgress, setDeleteInProgress] = useState(false);
+  const [hasActiveSessions, setHasActiveSessions] = useState(false);
+  const [activeSessionCount, setActiveSessionCount] = useState(0);
 
   useEffect(() => {
     fetchTrainers();
@@ -39,6 +44,72 @@ export default function AdminTrainersList() {
       setTrainers([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = async (trainer) => {
+    setTrainerToDelete(trainer);
+    
+    try {
+      // Check if the trainer has active sessions
+      const sessionsResponse = await axios.get(`/Back/trainers/sessions/${trainer._id}`);
+      const activeSessions = sessionsResponse.data.filter(
+        session => session.status === 'scheduled' || session.status === 'pending'
+      );
+      
+      setHasActiveSessions(activeSessions.length > 0);
+      setActiveSessionCount(activeSessions.length);
+    } catch (err) {
+      console.error('Error checking sessions:', err);
+    } finally {
+      setDeleteDialogOpen(true);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setTrainerToDelete(null);
+    setHasActiveSessions(false);
+    setActiveSessionCount(0);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!trainerToDelete) return;
+
+    try {
+      setDeleteInProgress(true);
+      
+      if (hasActiveSessions) {
+        // First cancel all active sessions
+        await axios.post(`/Back/trainers/cancel-all-sessions/${trainerToDelete._id}`);
+      }
+      
+      // Then delete the trainer
+      await axios.delete(`/Back/trainers/${trainerToDelete._id}`);
+      
+      // Update trainer list
+      setTrainers(trainers.filter(t => t._id !== trainerToDelete._id));
+      setDeleteDialogOpen(false);
+      setTrainerToDelete(null);
+      
+      const message = hasActiveSessions
+        ? `Trainer ${trainerToDelete.userId?.username || 'Unknown'} has been deleted and ${activeSessionCount} active sessions were cancelled.`
+        : `Trainer ${trainerToDelete.userId?.username || 'Unknown'} has been deleted successfully.`;
+      
+      setActionStatus({
+        message,
+        severity: 'success'
+      });
+    } catch (err) {
+      console.error('Error deleting trainer:', err);
+      setActionStatus({
+        message: err.response?.data?.message || 'Failed to delete trainer. Please try again.',
+        severity: 'error'
+      });
+    } finally {
+      setDeleteInProgress(false);
+      setHasActiveSessions(false);
+      setActiveSessionCount(0);
     }
   };
 
@@ -133,19 +204,12 @@ export default function AdminTrainersList() {
                         <Typography variant="h6" fontWeight="medium" sx={{ mr: 2 }}>
                           {trainer.userId?.username || 'Unknown User'}
                         </Typography>
-                        <Rating value={trainer.rating} precision={0.5} readOnly size="small" />
-                        <Typography variant="body2" sx={{ ml: 1, color: 'text.secondary' }}>
-                          ({trainer.reviewCount} reviews)
-                        </Typography>
                       </Box>
                     }
                     secondary={
                       <Box sx={{ color: 'text.secondary' }}>
                         <Typography variant="body2" component="span">
-                          <strong>Specializations:</strong> {trainer.specialization.join(', ')}
-                        </Typography>
-                        <Typography variant="body2" component="span" sx={{ ml: 3 }}>
-                          <strong>Rate:</strong> ${trainer.hourlyRate}/hour
+                          <strong>Specializations:</strong> {trainer.specialization?.join(', ') || 'None'}
                         </Typography>
                         <Typography variant="body2" component="span" sx={{ ml: 3 }}>
                           <strong>Experience:</strong> {trainer.experience} years
@@ -168,9 +232,7 @@ export default function AdminTrainersList() {
                       startIcon={<DeleteIcon />}
                       variant="outlined"
                       color="error"
-                      onClick={() => {
-                        // Handle delete functionality
-                      }}
+                      onClick={() => handleDeleteClick(trainer)}
                       sx={{ borderRadius: '8px' }}
                     >
                       Delete
@@ -183,6 +245,46 @@ export default function AdminTrainersList() {
           </List>
         </Paper>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog 
+        open={deleteDialogOpen} 
+        onClose={handleDeleteCancel}
+        aria-labelledby="delete-trainer-dialog-title"
+      >
+        <DialogTitle id="delete-trainer-dialog-title">
+          Confirm Delete Trainer
+        </DialogTitle>
+        <DialogContent>
+          <Typography paragraph>
+            Are you sure you want to delete the trainer profile for{' '}
+            <strong>{trainerToDelete?.userId?.username || 'Unknown'}</strong>?
+            This action cannot be undone.
+          </Typography>
+          
+          {hasActiveSessions && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              <Typography variant="body2">
+                <strong>Warning:</strong> This trainer has {activeSessionCount} active or pending sessions. 
+                Deleting this trainer will automatically cancel all these sessions and notify the affected clients.
+              </Typography>
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} disabled={deleteInProgress}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleDeleteConfirm} 
+            color="error" 
+            variant="contained"
+            disabled={deleteInProgress}
+          >
+            {deleteInProgress ? 'Deleting...' : hasActiveSessions ? 'Delete and Cancel Sessions' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
