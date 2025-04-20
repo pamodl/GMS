@@ -562,3 +562,75 @@ export const updateTrainerSchedule = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const deleteTrainer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // First check if trainer has active sessions
+    const sessions = await Session.find({ 
+      trainer: id,
+      status: { $in: ['scheduled', 'pending'] }
+    });
+    
+    if (sessions.length > 0) {
+      return res.status(400).json({ message: 'Cannot delete trainer with active sessions' });
+    }
+    
+    // Delete the trainer
+    const deletedTrainer = await Trainer.findByIdAndDelete(id);
+    
+    if (!deletedTrainer) {
+      return res.status(404).json({ message: 'Trainer not found' });
+    }
+    
+    res.status(200).json({ message: 'Trainer deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const cancelAllTrainerSessions = async (req, res) => {
+  try {
+    const { trainerId } = req.params;
+    
+    // Find all active sessions for this trainer
+    const sessions = await Session.find({
+      trainer: trainerId,
+      status: { $in: ['scheduled', 'pending'] }
+    });
+    
+    // Update all sessions to cancelled status
+    const updatePromises = sessions.map(session => 
+      Session.findByIdAndUpdate(
+        session._id,
+        { status: 'cancelled', notes: session.notes + ' (Automatically cancelled due to trainer removal)' },
+        { new: true }
+      )
+    );
+    
+    await Promise.all(updatePromises);
+    
+    // Also update the sessions array in the Trainer document
+    const trainer = await Trainer.findById(trainerId);
+    if (trainer) {
+      trainer.sessions.forEach(session => {
+        if (session.status === 'scheduled' || session.status === 'pending') {
+          session.status = 'cancelled';
+        }
+      });
+      await trainer.save();
+    }
+    
+    // Notify users about cancellation
+    // You could add notification code here if needed
+    
+    res.status(200).json({ 
+      message: `All ${sessions.length} active sessions for the trainer have been cancelled.`,
+      cancelledCount: sessions.length
+    });
+  } catch (error) {
+    console.error('Error cancelling sessions:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
