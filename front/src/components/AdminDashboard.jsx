@@ -323,7 +323,22 @@ export default function AdminDashboard() {
             </ActionButton>
           </DashboardCard>
         </Grid>
-
+                    {/* User Management Section */}
+        <Grid item xs={12} md={6} lg={3}>
+          <DashboardCard 
+            title="User Management" 
+            icon={<PeopleIcon color="info" fontSize="medium" />}
+          >
+            <ActionButton 
+              to="/admin/users" 
+              color="info" 
+              icon={<PersonIcon />}
+              delay={100}
+            >
+              Manage Users
+            </ActionButton>
+          </DashboardCard>
+        </Grid>
           {/* Notices Section */}
           <Grid item xs={12} md={6} lg={3}>
             <DashboardCard 
