@@ -53,14 +53,14 @@ export default function SignUp() {
           delete errors.email;
         }
         break;
-     // case 'regNumber':
-       // const regNumberPattern = /^[A-Za-z]{2}\/\d{4}\/\d{5}$/;
-       // if (!regNumberPattern.test(value)) {
-         // errors.regNumber = 'Format should be XX/YYYY/ZZZZZ';
-       // } else {
-         // delete errors.regNumber;
-       // }
-       // break;
+      case 'regNumber':
+        const regNumberPattern = /^[A-Za-z]{2}\/\d{4}\/\d{5}$/;
+        if (!regNumberPattern.test(value)) {
+          errors.regNumber = 'Format should be XX/YYYY/ZZZZZ';
+        } else {
+          delete errors.regNumber;
+        }
+        break;
       case 'passwordConfirm':
         if (value !== formData.password) {
           errors.passwordConfirm = 'Passwords do not match';
@@ -269,9 +269,9 @@ export default function SignUp() {
               fullWidth
               margin="normal"
               variant="outlined"
-              //placeholder="XX/YYYY/ZZZZZ"
-              //error={!!fieldErrors.regNumber}
-             // helperText={fieldErrors.regNumber || "Format: XX/YYYY/ZZZZZ"}
+              placeholder="XX/YYYY/ZZZZZ"
+              error={!!fieldErrors.regNumber}
+              helperText={fieldErrors.regNumber || "Format: XX/YYYY/ZZZZZ"}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
