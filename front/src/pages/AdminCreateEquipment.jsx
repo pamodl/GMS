@@ -36,7 +36,25 @@ export default function AdminCreateEquipment() {
   const [quantityError, setQuantityError] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [categories] = useState(['Sports Ball', 'Weights', 'Exercise Mat', 'Racket Sports']);
+  const [categories] = useState([
+    'Sports Ball', 
+    'Weights', 
+    'Exercise Mat', 
+    'Racket Sports',
+    'Cardio Equipment',
+    'Strength Training',
+    'Yoga Accessories',
+    'Boxing Gear',
+    'Swimming Equipment',
+    'Team Sports',
+    'Fitness Accessories',
+    'Recovery Tools',
+    'Resistance Bands',
+    'Dance Equipment',
+    'Training Accessories',
+    'Outdoor Sports',
+    'Other'
+  ]);
 
   const validateForm = () => {
     let isValid = true;
@@ -176,6 +194,7 @@ export default function AdminCreateEquipment() {
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
                   />
                 )}
+                freeSolo
               />
               <FormHelperText>Select or type a category</FormHelperText>
             </FormControl>

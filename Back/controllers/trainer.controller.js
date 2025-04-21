@@ -634,3 +634,70 @@ export const cancelAllTrainerSessions = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+export const cancelScheduledSession = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { reason } = req.body;
+    
+    // Find the session
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+    
+    // Check if session is in a state that can be cancelled
+    if (session.status === 'cancelled' || session.status === 'completed') {
+      return res.status(400).json({ message: 'This session cannot be cancelled' });
+    }
+    
+    // Update session status and notes
+    session.status = 'cancelled';
+    session.notes = reason ? `Cancelled: ${reason}` : 'Cancelled by trainer';
+    await session.save();
+    
+    // Update trainer's session record too
+    const trainer = await Trainer.findById(session.trainer);
+    if (trainer) {
+      const trainerSessionIndex = trainer.sessions.findIndex(
+        s => s._id.toString() === sessionId
+      );
+      
+      if (trainerSessionIndex !== -1) {
+        trainer.sessions[trainerSessionIndex].status = 'cancelled';
+        trainer.sessions[trainerSessionIndex].notes = session.notes;
+        await trainer.save();
+      }
+    }
+    
+    // Send notification to student
+    try {
+      const student = await User.findById(session.user);
+      const trainerUser = await User.findById(trainer.userId);
+      
+      if (student && trainerUser) {
+        const formattedDate = new Date(session.date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        
+        const userNotice = new Notice({
+          title: `Training Session Cancelled`,
+          message: `Your ${session.sessionType} session with trainer ${trainerUser.username} on ${formattedDate} at ${session.startTime} has been cancelled.${reason ? ` Reason: ${reason}` : ''}`,
+          userId: student._id,
+          public: false,
+        });
+        await userNotice.save();
+      }
+    } catch (noticeError) {
+      console.error('Error creating cancellation notification:', noticeError);
+    }
+    
+    res.status(200).json({ message: 'Session cancelled successfully', session });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
