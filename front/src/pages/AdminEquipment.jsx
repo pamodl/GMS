@@ -165,14 +165,6 @@ export default function AdminEquipmentList() {
       ) : equipment.length === 0 ? (
         <Paper elevation={1} sx={{ p: 4, textAlign: 'center', borderRadius: '12px' }}>
           <Typography variant="body1" color="text.secondary">No equipment found.</Typography>
-          <Button 
-            variant="contained" 
-            component={Link} 
-            to="/admin/create-equipment"
-            sx={{ mt: 2, borderRadius: '8px' }}
-          >
-            Add Your First Equipment
-          </Button>
         </Paper>
       ) : (
         <Paper elevation={2} sx={{ borderRadius: '12px', overflow: 'hidden' }}>

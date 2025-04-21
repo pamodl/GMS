@@ -15,7 +15,7 @@ import {
   updateTrainerSchedule,
   deleteTrainer,
   cancelAllTrainerSessions,
-  
+  cancelScheduledSession,
 } from '../controllers/trainer.controller.js';
 import Trainer from '../models/trainer.model.js'; 
 
@@ -53,5 +53,6 @@ router.put('/session/:sessionId/reject', rejectSessionRequest);
 router.put('/:id/schedule', updateTrainerSchedule);
 router.delete('/:id', deleteTrainer);
 router.post('/cancel-all-sessions/:trainerId', cancelAllTrainerSessions);
+router.put('/session/:sessionId/cancel', cancelScheduledSession);
 
 export default router;
