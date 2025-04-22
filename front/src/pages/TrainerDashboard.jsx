@@ -36,6 +36,11 @@ export default function TrainerDashboard() {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [sessionToReject, setSessionToReject] = useState(null);
+
+  // Add cancel dialog state
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [sessionToCancel, setSessionToCancel] = useState(null);
+  const [cancelReason, setCancelReason] = useState('');
   
   const [stats, setStats] = useState({
     pendingSessions: 0,
@@ -115,42 +120,56 @@ export default function TrainerDashboard() {
     return true;
   });
   
-  const handleUpdateStatus = async (sessionId, status) => {
+  const handleUpdateStatus = async (sessionId, status, notes = '') => {
     try {
       setError(null);
       const payload = { status };
       
       // If completing the session and there are notes, include them
-      if (status === 'completed' && sessionNotes.trim()) {
-        payload.notes = sessionNotes;
+      if (notes.trim()) {
+        payload.notes = notes;
       }
       
       await axios.put(`/Back/trainers/session/${sessionId}/status`, payload);
       
       // Update the session in state
       setSessions(prev => prev.map(session => 
-        session._id === sessionId ? { ...session, status, notes: sessionNotes || session.notes } : session
+        session._id === sessionId ? { ...session, status, notes: notes || session.notes } : session
       ));
       
       // Update stats
       if (status === 'completed') {
-        setStats(prev => ({
-          ...prev,
-          completedSessions: prev.completedSessions + 1,
-          todaySessions: isToday(parseISO(selectedSession.date)) ? prev.todaySessions - 1 : prev.todaySessions,
-          upcomingSessions: !isToday(parseISO(selectedSession.date)) ? prev.upcomingSessions - 1 : prev.upcomingSessions
-        }));
+        setStats(prev => {
+          const session = sessions.find(s => s._id === sessionId);
+          const isSessionToday = session ? isToday(parseISO(session.date)) : false;
+          
+          return {
+            ...prev,
+            completedSessions: prev.completedSessions + 1,
+            todaySessions: isSessionToday ? prev.todaySessions - 1 : prev.todaySessions,
+            upcomingSessions: !isSessionToday ? prev.upcomingSessions - 1 : prev.upcomingSessions
+          };
+        });
       } else if (status === 'cancelled') {
-        setStats(prev => ({
-          ...prev,
-          cancelledSessions: prev.cancelledSessions + 1,
-          todaySessions: isToday(parseISO(selectedSession.date)) ? prev.todaySessions - 1 : prev.todaySessions,
-          upcomingSessions: !isToday(parseISO(selectedSession.date)) ? prev.upcomingSessions - 1 : prev.upcomingSessions
-        }));
+        setStats(prev => {
+          const session = sessions.find(s => s._id === sessionId);
+          const isSessionToday = session ? isToday(parseISO(session.date)) : false;
+          
+          return {
+            ...prev,
+            cancelledSessions: prev.cancelledSessions + 1,
+            todaySessions: isSessionToday ? prev.todaySessions - 1 : prev.todaySessions,
+            upcomingSessions: !isSessionToday ? prev.upcomingSessions - 1 : prev.upcomingSessions
+          };
+        });
       }
       
+      // Close any open dialogs
       setDialogOpen(false);
+      setCancelDialogOpen(false);
       setSessionNotes('');
+      setCancelReason('');
+      setSessionToCancel(null);
     } catch (err) {
       console.error('Error updating session status:', err.response || err);
       setError('Failed to update session status: ' + (err.response?.data?.message || err.message));
@@ -227,6 +246,60 @@ export default function TrainerDashboard() {
       setError('Failed to reject session: ' + (err.response?.data?.message || err.message));
     }
   };
+  
+  // Handle opening the cancel dialog
+  const handleOpenCancelDialog = (session) => {
+    setSessionToCancel(session);
+    setCancelReason('');
+    setCancelDialogOpen(true);
+  };
+  
+  // Handle cancellation of a scheduled session
+
+
+
+// Handle cancellation of a scheduled session
+const handleCancelSession = async () => {
+  if (!sessionToCancel) return;
+  
+  try {
+    setError(null);
+    
+    // Use a specialized endpoint for cancellation, like your approve/reject endpoints
+    await axios.put(`/Back/trainers/session/${sessionToCancel._id}/cancel`, {
+      reason: cancelReason
+    });
+    
+    // Update the session in state
+    setSessions(prev => prev.map(session => 
+      session._id === sessionToCancel._id ? 
+      { ...session, status: 'cancelled', notes: cancelReason ? `Cancelled: ${cancelReason}` : session.notes } : 
+      session
+    ));
+    
+    // Update stats
+    setStats(prev => {
+      const session = sessions.find(s => s._id === sessionToCancel._id);
+      const isSessionToday = session ? isToday(parseISO(session.date)) : false;
+      
+      return {
+        ...prev,
+        cancelledSessions: prev.cancelledSessions + 1,
+        todaySessions: isSessionToday ? prev.todaySessions - 1 : prev.todaySessions,
+        upcomingSessions: !isSessionToday ? prev.upcomingSessions - 1 : prev.upcomingSessions
+      };
+    });
+    
+    // Close dialog and reset state
+    setCancelDialogOpen(false);
+    setCancelReason('');
+    setSessionToCancel(null);
+    
+  } catch (err) {
+    console.error('Error cancelling session:', err.response || err);
+    setError('Failed to cancel session: ' + (err.response?.data?.message || err.message));
+  }
+};
   
   const handleOpenCompleteDialog = (session) => {
     setSelectedSession(session);
@@ -462,10 +535,7 @@ export default function TrainerDashboard() {
                           variant="outlined" 
                           size="small" 
                           color="error"
-                          onClick={() => {
-                            setSelectedSession(session);
-                            handleUpdateStatus(session._id, 'cancelled');
-                          }}
+                          onClick={() => handleOpenCancelDialog(session)}
                           startIcon={<CancelIcon />}
                         >
                           Cancel
@@ -512,7 +582,7 @@ export default function TrainerDashboard() {
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
           <Button 
-            onClick={() => handleUpdateStatus(selectedSession?._id, 'completed')} 
+            onClick={() => handleUpdateStatus(selectedSession?._id, 'completed', sessionNotes)} 
             color="primary"
             variant="contained"
           >
@@ -557,6 +627,46 @@ export default function TrainerDashboard() {
             variant="contained"
           >
             Reject Request
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Cancel Session Dialog */}
+      <Dialog open={cancelDialogOpen} onClose={() => setCancelDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Cancel Session</DialogTitle>
+        <DialogContent>
+          <Typography paragraph>
+            Are you sure you want to cancel this session? Please provide a reason (optional).
+          </Typography>
+          
+          <Typography variant="subtitle2" gutterBottom>
+            Client: {sessionToCancel?.user?.username}
+          </Typography>
+          
+          <Typography variant="body2" gutterBottom>
+            {sessionToCancel && format(parseISO(sessionToCancel.date), 'MMMM d, yyyy')}
+            {' • '}{sessionToCancel?.startTime} - {sessionToCancel?.endTime}
+          </Typography>
+          
+          <TextField
+            label="Cancellation Reason"
+            multiline
+            rows={3}
+            fullWidth
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            placeholder="Explain why you're cancelling this session"
+            sx={{ mt: 2 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCancelDialogOpen(false)}>Back</Button>
+          <Button 
+            onClick={handleCancelSession} 
+            color="error"
+            variant="contained"
+          >
+            Confirm Cancellation
           </Button>
         </DialogActions>
       </Dialog>
