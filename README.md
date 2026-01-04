@@ -1,6 +1,6 @@
 # GMS
 
-GMS is a JavaScript-based project with a React + Vite frontend. This repository contains the source code and configuration for the project frontend and supporting scripts. The goal of this README is to provide clear instructions to set up, run, and contribute to the project.
+GMS(Gymnasium Management System) is a JavaScript-based project with a React + Vite frontend. This repository contains the source code and configuration for the project frontend and supporting scripts. The goal of this README is to provide clear instructions to set up, run, and contribute to the project.
 
 ## Features
 
